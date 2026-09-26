@@ -1,0 +1,76 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+.env
+.env.local
+.env.*.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-workspace
+*.sublime-project
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Local development
+*.db
+*.sqlite
+*.sqlite3
+local_models/
+downloads/
+temp/
+tmp/
+
+# Node (if frontend is local)
+node_modules/
+dist/
+.next/
+out/
+.turbo/
+
+# Generated files
+alembic/versions/__pycache__/
+
+# Claude Code local settings (personal, not shared)
+.claude/settings.local.json
+
+# Docker
+.docker/
+docker-compose.override.yml

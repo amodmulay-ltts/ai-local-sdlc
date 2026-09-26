@@ -1,0 +1,156 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ai-local-sdlc"
+version = "0.1.0"
+description = "AI-powered Software Development Lifecycle factory: KB → requirements → judge → traceability"
+readme = "PLAN.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "AI SDLC Team", email = "amod.mulay@ltts.com" }
+]
+license = { text = "Apache-2.0" }
+
+dependencies = [
+    # API & web framework
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "httpx>=0.26.0",
+
+    # Database
+    "sqlalchemy>=2.0.0",
+    "alembic>=1.13.0",
+    "psycopg2-binary>=2.9.9",
+    "pgvector>=0.2.0",
+
+    # Data validation & serialization
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+
+    # Document parsing
+    "python-docx>=0.8.11",
+    "openpyxl>=3.11.0",
+    "PyPDF2>=4.0.0",
+    "unstructured[pdf,docx]>=0.10.0",
+    "pymupdf>=1.23.0",
+
+    # Git support
+    "GitPython>=3.1.40",
+
+    # Orchestration & agents
+    "langchain>=0.1.0",
+    "langgraph>=0.0.0",
+    "langchain-anthropic>=0.0.0",
+
+    # LLM APIs
+    "anthropic>=0.21.0",
+
+    # Async & concurrency
+    "aiofiles>=23.2.0",
+
+    # Utilities
+    "python-dotenv>=1.0.0",
+    "tenacity>=8.2.0",  # Retry logic
+    "pydantic-core>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Testing
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "respx>=0.21.0",  # HTTP mocking
+    "factory-boy>=3.3.0",  # Test fixtures
+    "testcontainers[postgres]>=4.0.0",  # Docker containers for tests
+
+    # Code quality
+    "ruff>=0.1.0",
+    "mypy>=1.7.0",
+    "black>=23.12.0",
+    "isort>=5.13.0",
+    "pre-commit>=3.5.0",
+
+    # Observability
+    "opentelemetry-api>=1.21.0",
+    "opentelemetry-sdk>=1.21.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+python_files = ["test_*.py", "*_test.py"]
+addopts = "--cov=src --cov-report=term-missing --strict-markers"
+markers = [
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+
+[tool.coverage.run]
+branch = true
+omit = [
+    "*/site-packages/*",
+    "*/distutils/*",
+    "*/tests/*",
+]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false  # Too strict for early stage, set to true later
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # Pyflakes
+    "I",    # isort
+    "C",    # flake8-comprehensions
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "C901",  # complexity
+]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".venv",
+    "venv",
+]
+
+[tool.ruff.isort]
+known-first-party = ["src"]
+known-third-party = ["fastapi", "sqlalchemy", "pydantic"]
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  \.git
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip_gitignore = true
+known_first_party = ["src"]
