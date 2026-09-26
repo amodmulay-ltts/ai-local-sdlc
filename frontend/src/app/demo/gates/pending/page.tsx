@@ -21,37 +21,37 @@ export default function GateDecisionPage() {
         description={`Playbook: ${g.playbook} · Project: ${g.project} · Waiting since ${g.waitingSince}`}
       />
 
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 mb-6">
-        <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wide mb-3">Why this gate?</h2>
-        <p className="text-sm text-slate-400 mb-4">Step 3 (Parallel Reviews) identified disagreement:</p>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 mb-6">
+        <h2 className="text-sm font-semibold text-slate-600 dark:text-slate-400 dark:text-slate-300 uppercase tracking-wide mb-3">Why this gate?</h2>
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">Step 3 (Parallel Reviews) identified disagreement:</p>
         <div className="space-y-2 mb-4">
           {g.reviews.map((r) => (
             <div key={r.reviewer} className="flex items-start gap-2 text-sm">
-              <span className={r.flagged ? 'text-amber-400' : 'text-emerald-400'}>{r.flagged ? '⚠️' : '✅'}</span>
-              <p className="text-slate-300">
-                <span className="font-medium text-slate-200">{r.reviewer}:</span> &ldquo;{r.verdict}&rdquo;
+              <span className={r.flagged ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400'}>{r.flagged ? '⚠️' : '✅'}</span>
+              <p className="text-slate-600 dark:text-slate-400 dark:text-slate-300">
+                <span className="font-medium text-slate-800 dark:text-slate-200">{r.reviewer}:</span> &ldquo;{r.verdict}&rdquo;
               </p>
             </div>
           ))}
         </div>
 
-        <div className="bg-slate-950 border border-slate-800 rounded-lg p-4 text-xs space-y-1 mb-4">
-          <p className="text-slate-300 font-semibold mb-1">Judge Agent Analysis</p>
-          <p className="text-slate-400">
-            Disagreement level: <span className="text-amber-400">{g.judgeAnalysis.disagreementLevel}</span>
+        <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-4 text-xs space-y-1 mb-4">
+          <p className="text-slate-600 dark:text-slate-400 dark:text-slate-300 font-semibold mb-1">Judge Agent Analysis</p>
+          <p className="text-slate-600 dark:text-slate-400">
+            Disagreement level: <span className="text-amber-700 dark:text-amber-400">{g.judgeAnalysis.disagreementLevel}</span>
           </p>
-          <p className="text-slate-400">
-            Uncertainty score: <span className="text-amber-400">{g.judgeAnalysis.uncertaintyScore}</span> (threshold:{' '}
+          <p className="text-slate-600 dark:text-slate-400">
+            Uncertainty score: <span className="text-amber-700 dark:text-amber-400">{g.judgeAnalysis.uncertaintyScore}</span> (threshold:{' '}
             {g.judgeAnalysis.threshold})
           </p>
-          <p className="text-slate-400">
-            Escalation triggered: <span className="text-amber-400">YES</span>
+          <p className="text-slate-600 dark:text-slate-400">
+            Escalation triggered: <span className="text-amber-700 dark:text-amber-400">YES</span>
           </p>
         </div>
 
-        <div className="flex items-start gap-2 bg-amber-500/10 border border-amber-500/30 rounded-lg p-3">
-          <AlertTriangle size={16} className="text-amber-400 mt-0.5 shrink-0" />
-          <p className="text-sm text-amber-200">
+        <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-lg p-3">
+          <AlertTriangle size={16} className="text-amber-700 dark:text-amber-400 mt-0.5 shrink-0" />
+          <p className="text-sm text-amber-700 dark:text-amber-200">
             <span className="font-semibold">Recommendation:</span> {g.recommendation}
           </p>
         </div>
@@ -59,9 +59,9 @@ export default function GateDecisionPage() {
 
       {!submitted ? (
         <>
-          <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wide mb-3">Decision options</h2>
+          <h2 className="text-sm font-semibold text-slate-600 dark:text-slate-400 dark:text-slate-300 uppercase tracking-wide mb-3">Decision options</h2>
           <div className="space-y-3 mb-6">
-            <label className="flex items-start gap-3 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl p-4 cursor-pointer">
+            <label className="flex items-start gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-700 rounded-xl p-4 cursor-pointer">
               <input
                 type="radio"
                 name="choice"
@@ -71,13 +71,13 @@ export default function GateDecisionPage() {
               />
               <div>
                 <p className="font-medium text-white text-sm">Approve & proceed</p>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                   Accept output despite disagreement. Expert judgment that Review C findings are acceptable.
                   Requires an approver note.
                 </p>
               </div>
             </label>
-            <label className="flex items-start gap-3 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl p-4 cursor-pointer">
+            <label className="flex items-start gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-700 rounded-xl p-4 cursor-pointer">
               <input
                 type="radio"
                 name="choice"
@@ -87,13 +87,13 @@ export default function GateDecisionPage() {
               />
               <div>
                 <p className="font-medium text-white text-sm">Request changes</p>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                   Send back to the Requirements Agent to address the specific gaps reviewers flagged, then restart
                   from Step 5.
                 </p>
               </div>
             </label>
-            <label className="flex items-start gap-3 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl p-4 cursor-pointer">
+            <label className="flex items-start gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-700 rounded-xl p-4 cursor-pointer">
               <input
                 type="radio"
                 name="choice"
@@ -103,7 +103,7 @@ export default function GateDecisionPage() {
               />
               <div>
                 <p className="font-medium text-white text-sm">Escalate to architect</p>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                   This requires a higher-level decision. Route to Tech Lead (~1h), Architect (~4h), or both (~6h).
                 </p>
               </div>
@@ -112,12 +112,12 @@ export default function GateDecisionPage() {
 
           {choice === 'approve' && (
             <div className="mb-6">
-              <label className="text-sm font-semibold text-slate-300 mb-2 block">Approver note (mandatory)</label>
+              <label className="text-sm font-semibold text-slate-600 dark:text-slate-400 dark:text-slate-300 mb-2 block">Approver note (mandatory)</label>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 rows={5}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-cyan-500"
+                className="w-full bg-white dark:bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500"
               />
             </div>
           )}
@@ -130,12 +130,12 @@ export default function GateDecisionPage() {
           </button>
         </>
       ) : (
-        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-5">
-          <p className="text-emerald-400 font-semibold text-sm mb-1">
+        <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-xl p-5">
+          <p className="text-emerald-700 dark:text-emerald-400 font-semibold text-sm mb-1">
             ✅ Decision recorded (demo only — nothing was actually submitted)
           </p>
-          <p className="text-sm text-slate-300 whitespace-pre-line">{note}</p>
-          <button onClick={() => setSubmitted(false)} className="mt-3 text-xs text-slate-400 hover:text-white underline">
+          <p className="text-sm text-slate-600 dark:text-slate-400 dark:text-slate-300 whitespace-pre-line">{note}</p>
+          <button onClick={() => setSubmitted(false)} className="mt-3 text-xs text-slate-600 dark:text-slate-400 hover:text-white underline">
             Reset
           </button>
         </div>

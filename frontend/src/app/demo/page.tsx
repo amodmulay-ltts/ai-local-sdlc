@@ -67,35 +67,35 @@ export default function DemoOverviewPage() {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-        <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-white mb-3">Why this exists</h2>
-          <p className="text-sm text-slate-400 leading-relaxed mb-3">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">Why this exists</h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
             Most organizations have tried AI copilots. Engineers code faster — releases don&apos;t move. That&apos;s
             not a technology failure; it&apos;s a unit-of-automation failure. The value leaks in the handoffs
             <em> between</em> functions, not inside them.
           </p>
-          <p className="text-sm text-slate-400 leading-relaxed">
-            The Factory orchestrates <strong className="text-slate-200">playbooks</strong> (repeatable workflows)
-            that run <strong className="text-slate-200">agents</strong> (execution units) with{' '}
-            <strong className="text-slate-200">human gates</strong> at points of genuine uncertainty, producing{' '}
-            <strong className="text-slate-200">evidence</strong> instead of asking someone to trust the model.
+          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+            The Factory orchestrates <strong className="text-slate-800 dark:text-slate-200">playbooks</strong> (repeatable workflows)
+            that run <strong className="text-slate-800 dark:text-slate-200">agents</strong> (execution units) with{' '}
+            <strong className="text-slate-800 dark:text-slate-200">human gates</strong> at points of genuine uncertainty, producing{' '}
+            <strong className="text-slate-800 dark:text-slate-200">evidence</strong> instead of asking someone to trust the model.
           </p>
         </div>
-        <div className="bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-xl p-6">
-          <h3 className="text-sm font-semibold text-cyan-400 uppercase tracking-wide mb-3">The governance equation</h3>
-          <p className="text-sm text-slate-200 font-mono leading-relaxed">
+        <div className="bg-gradient-to-br from-cyan-100 dark:from-cyan-500/10 to-blue-100 dark:to-blue-500/10 border border-cyan-200 dark:border-cyan-500/20 rounded-xl p-6">
+          <h3 className="text-sm font-semibold text-cyan-700 dark:text-cyan-400 uppercase tracking-wide mb-3">The governance equation</h3>
+          <p className="text-sm text-slate-700 dark:text-slate-200 font-mono leading-relaxed">
             AI + Enterprise Data<br />+ Human Approval<br />+ Regulatory Governance<br />
-            <span className="text-cyan-400">= Measurable Productivity</span>
+            <span className="text-cyan-700 dark:text-cyan-400">= Measurable Productivity</span>
           </p>
         </div>
       </div>
 
-      <h2 className="text-lg font-semibold text-white mb-4">The lifecycle — the central organizing principle</h2>
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 mb-12">
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">The lifecycle — the central organizing principle</h2>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 mb-12">
         <LifecycleStrip />
       </div>
 
-      <h2 className="text-lg font-semibold text-white mb-4">Guided tour — 7 stops</h2>
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Guided tour — 7 stops</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {tourStops.map((stop) => {
           const Icon = stop.icon;
@@ -103,16 +103,16 @@ export default function DemoOverviewPage() {
             <Link
               key={stop.href}
               href={stop.href}
-              className="group flex items-start gap-4 bg-slate-900 border border-slate-800 hover:border-cyan-500/40 rounded-xl p-5 transition-colors"
+              className="group flex items-start gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-cyan-500/60 dark:hover:border-cyan-500/40 rounded-xl p-5 transition-colors"
             >
-              <div className="p-2.5 rounded-lg bg-slate-800 text-cyan-400 group-hover:bg-cyan-500/10 transition-colors shrink-0">
+              <div className="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 group-hover:bg-cyan-50 dark:group-hover:bg-cyan-500/10 transition-colors shrink-0">
                 <Icon size={20} />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-white mb-1">{stop.title}</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">{stop.description}</p>
+                <h3 className="font-semibold text-slate-900 dark:text-white mb-1">{stop.title}</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{stop.description}</p>
               </div>
-              <ArrowRight size={16} className="text-slate-600 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all shrink-0 mt-1" />
+              <ArrowRight size={16} className="text-slate-300 dark:text-slate-600 group-hover:text-cyan-500 group-hover:translate-x-1 transition-all shrink-0 mt-1" />
             </Link>
           );
         })}
