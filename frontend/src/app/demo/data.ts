@@ -218,6 +218,8 @@ interface AgentInfo {
   disputes?: string;
   findings?: string;
   escalations?: string;
+  examplePrompt?: string;
+  orchestration?: string;
 }
 
 export const agentCatalog: Array<{ stage: string; agents: AgentInfo[] }> = [
@@ -233,6 +235,8 @@ export const agentCatalog: Array<{ stage: string; agents: AgentInfo[] }> = [
         successCount: '412/438',
         avgTime: '2m 34s',
         models: 'Claude Opus, Claude Sonnet',
+        examplePrompt: 'You are a requirements analyst. Analyze the business intent and knowledge sources to generate clear, testable requirements. Use EARS format. Trace each requirement to its source.',
+        orchestration: 'Runs first in sequence. Output feeds to independent reviewers (Compliance, Clarity, Traceability) in parallel.',
       },
       {
         icon: '📊',
@@ -285,6 +289,8 @@ export const agentCatalog: Array<{ stage: string; agents: AgentInfo[] }> = [
         avgTime: '1m 24s',
         models: 'Claude Opus',
         disputes: '3.2%',
+        examplePrompt: 'Review these requirements for completeness. Check: all functional requirements present, all non-functional requirements quantified, acceptance criteria defined, no ambiguity. Use standard rubric.',
+        orchestration: 'Runs in parallel with Clarity and Traceability reviewers. Outputs feed to Judge Agent for conflict resolution.',
       },
       {
         icon: '🚨',
@@ -329,6 +335,8 @@ export const agentCatalog: Array<{ stage: string; agents: AgentInfo[] }> = [
         avgTime: '1m 42s',
         models: 'Claude Opus',
         escalations: '847 (25.8%)',
+        examplePrompt: 'Analyze these three independent reviews. Where do they agree? Where do they conflict? What uncertainty remains? Compute confidence score. Flag areas needing human judgment.',
+        orchestration: 'Awaits all three parallel reviewers. Outputs analysis to conditional human gate. If uncertainty > threshold, gate triggers escalation.',
       },
     ],
   },

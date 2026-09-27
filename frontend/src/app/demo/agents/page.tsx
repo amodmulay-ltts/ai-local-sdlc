@@ -72,6 +72,20 @@ export default function AgentsPage() {
                       </div>
                     )}
                   </dl>
+
+                  {agent.examplePrompt && (
+                    <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+                      <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Example Prompt</p>
+                      <p className="text-xs text-slate-700 dark:text-slate-300 italic">&ldquo;{agent.examplePrompt}&rdquo;</p>
+                    </div>
+                  )}
+
+                  {agent.orchestration && (
+                    <div className="mt-3 p-2 bg-slate-50 dark:bg-slate-950 rounded border border-slate-200 dark:border-slate-800">
+                      <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Orchestration</p>
+                      <p className="text-xs text-slate-700 dark:text-slate-300">{agent.orchestration}</p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

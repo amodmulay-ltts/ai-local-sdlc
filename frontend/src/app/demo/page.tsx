@@ -8,6 +8,9 @@ import {
   FileCheck2,
   GitBranch,
   ArrowRight,
+  Database,
+  Layers,
+  Brain,
 } from 'lucide-react';
 import LifecycleStrip from './components/LifecycleStrip';
 import PageHeader from './components/PageHeader';
@@ -87,6 +90,31 @@ export default function DemoOverviewPage() {
             AI + Enterprise Data<br />+ Human Approval<br />+ Regulatory Governance<br />
             <span className="text-cyan-700 dark:text-cyan-400">= Measurable Productivity</span>
           </p>
+        </div>
+      </div>
+
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">The underlying technology fabric</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Brain size={20} className="text-cyan-600 dark:text-cyan-400" />
+            <h3 className="font-semibold text-slate-900 dark:text-white">LLM Orchestration</h3>
+          </div>
+          <p className="text-sm text-slate-600 dark:text-slate-400">Claude (Anthropic) + Ollama (local models) connected via LLM Adapter pattern. Swap models per step without changing playbooks.</p>
+        </div>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Database size={20} className="text-emerald-600 dark:text-emerald-400" />
+            <h3 className="font-semibold text-slate-900 dark:text-white">Vector Store</h3>
+          </div>
+          <p className="text-sm text-slate-600 dark:text-slate-400">PostgreSQL + pgvector for semantic search across ingested knowledge. Scoped by project, shared across organization.</p>
+        </div>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Layers size={20} className="text-blue-600 dark:text-blue-400" />
+            <h3 className="font-semibold text-slate-900 dark:text-white">Playbook Engine</h3>
+          </div>
+          <p className="text-sm text-slate-600 dark:text-slate-400">State machine orchestrating agents in parallel, with human gates at verification points. Evidence collected as workflow byproduct.</p>
         </div>
       </div>
 
