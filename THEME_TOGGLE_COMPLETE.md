@@ -2,7 +2,7 @@
 
 ## ✅ Implementation Complete
 
-A **full dark mode implementation** has been added to the AI-SDLC Factory UI with smooth toggle functionality.
+A **full dark mode implementation** has been added to the Engineering Intelligence Factory UI with smooth toggle functionality.
 
 ---
 

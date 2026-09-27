@@ -1,7 +1,7 @@
 .PHONY: help install install-dev clean test lint format type-check db-up db-down migrate migrate-create run docs
 
 help:
-	@echo "AI SDLC Factory - Development Commands"
+	@echo "Engineering Intelligence Factory - Development Commands"
 	@echo ""
 	@echo "install              Install core dependencies"
 	@echo "install-dev          Install development dependencies"

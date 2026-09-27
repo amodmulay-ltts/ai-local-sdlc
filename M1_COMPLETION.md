@@ -4,7 +4,7 @@ Status: **READY FOR VERIFICATION**
 
 ## Summary of M1 (Rows 1.1–1.8)
 
-This milestone delivers the complete core data model for the AI-SDLC Factory, with **full CRUD operations** via FastAPI routes, Pydantic validation, and database integration.
+This milestone delivers the complete core data model for the Engineering Intelligence Factory, with **full CRUD operations** via FastAPI routes, Pydantic validation, and database integration.
 
 ### ✅ What was built
 

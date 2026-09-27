@@ -1,4 +1,4 @@
-// Static, hand-authored demo content for the AI-SDLC Factory concept tour.
+// Static, hand-authored demo content for the Engineering Intelligence Factory concept tour.
 // Nothing here calls the API — this route exists purely to visualize the
 // end-to-end concept (Lifecycle, Playbooks, Agents, Gates, Evidence) before
 // the real orchestration engine (M4+) exists.

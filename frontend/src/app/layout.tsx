@@ -6,7 +6,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "AI-SDLC Factory",
+  title: "Engineering Intelligence Factory",
   description: "AI-powered Software Development Lifecycle Management",
 };
 

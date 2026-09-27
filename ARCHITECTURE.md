@@ -1,4 +1,4 @@
-# Architecture — AI-SDLC Factory
+# Architecture — Engineering Intelligence Factory
 
 ## Vision: From SDLC to AIDLC
 

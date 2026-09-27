@@ -1,4 +1,4 @@
-"""SQLAlchemy models for the AI-SDLC Factory."""
+"""SQLAlchemy models for the Engineering Intelligence Factory."""
 
 from datetime import datetime
 

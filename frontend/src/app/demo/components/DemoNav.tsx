@@ -29,7 +29,7 @@ export default function DemoNav() {
               <Factory size={18} className="text-slate-950" />
             </div>
             <div className="leading-tight">
-              <p className="text-sm font-bold text-slate-900 dark:text-white">AI-SDLC Factory</p>
+              <p className="text-sm font-bold text-slate-900 dark:text-white">Engineering Intelligence Factory</p>
               <p className="text-[10px] text-cyan-600 dark:text-cyan-400 tracking-wide uppercase">
                 Concept Tour · Demo Mode
               </p>

@@ -1,3 +1,3 @@
-"""AI SDLC Factory - Root package."""
+"""Engineering Intelligence Factory - Root package."""
 
 __version__ = "0.1.0"

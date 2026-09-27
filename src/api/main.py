@@ -8,7 +8,7 @@ from src.api.routes import router
 
 # Create app
 app = FastAPI(
-    title="AI-SDLC Factory API",
+    title="Engineering Intelligence Factory API",
     description="AI-powered Software Development Lifecycle system",
     version="0.1.0",
     debug=settings.api_debug,
@@ -31,7 +31,7 @@ app.include_router(router)
 async def root():
     """Root endpoint."""
     return {
-        "message": "AI-SDLC Factory API",
+        "message": "Engineering Intelligence Factory API",
         "version": "0.1.0",
         "docs": "/docs",
     }

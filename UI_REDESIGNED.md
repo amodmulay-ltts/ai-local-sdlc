@@ -1,4 +1,4 @@
-# AI-SDLC Factory - Professional UI Redesign
+# Engineering Intelligence Factory - Professional UI Redesign
 
 ## 🎨 Design Upgrade Complete
 

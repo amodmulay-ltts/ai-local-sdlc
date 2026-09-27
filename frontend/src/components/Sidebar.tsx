@@ -36,7 +36,7 @@ export default function Sidebar() {
             <Zap size={20} />
           </div>
           <div>
-            <h1 className="text-lg font-bold tracking-tight">AI-SDLC</h1>
+            <h1 className="text-base font-bold tracking-tight leading-tight">Engineering Intelligence</h1>
             <p className="text-xs text-slate-400">Factory</p>
           </div>
         </div>

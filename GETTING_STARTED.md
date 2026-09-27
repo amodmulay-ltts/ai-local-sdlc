@@ -2,7 +2,7 @@
 
 ## What was just built (M0 — Repo & Tooling Bootstrap)
 
-The foundational infrastructure for the AI-SDLC Factory is now in place:
+The foundational infrastructure for the Engineering Intelligence Factory is now in place:
 
 ### 📦 Project Structure
 ```

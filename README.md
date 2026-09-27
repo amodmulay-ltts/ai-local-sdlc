@@ -1,4 +1,4 @@
-# AI-SDLC Factory
+# Engineering Intelligence Factory
 
 An AI-powered Software Development Lifecycle system that turns raw project material (PDFs, docs, spreadsheets, git repos) into governed knowledge bases, generates requirements specifications, and validates them with independent LLM judges.
 

@@ -1,4 +1,4 @@
-# AI-SDLC Factory — Build Plan
+# Engineering Intelligence Factory — Build Plan
 
 A system that turns raw project material (PDFs, docs, spreadsheets, git repos) into a
 governed knowledge base, uses that knowledge base to draft SDLC artifacts (starting

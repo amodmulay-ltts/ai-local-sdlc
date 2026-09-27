@@ -28,7 +28,7 @@ Dashboard shows:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  AI-SDLC Factory                              [⚙️ Settings] │
+│  Engineering Intelligence Factory                              [⚙️ Settings] │
 ├─────────────────────────────────────────────────────────────┤
 │                                                              │
 │  Intent Definition → Requirements → Architecture → Code → Test → Deploy → Feedback
@@ -657,7 +657,7 @@ Dashboard shows:
 ### Redesigned Factory Homepage
 ```
 ┌──────────────────────────────────────────────────────────┐
-│ AI-SDLC Factory                              [⚙️ Settings]│
+│ Engineering Intelligence Factory                              [⚙️ Settings]│
 ├──────────────────────────────────────────────────────────┤
 │                                                            │
 │  THE LIFECYCLE                                             │

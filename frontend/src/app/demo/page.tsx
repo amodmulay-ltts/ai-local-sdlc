@@ -63,7 +63,7 @@ export default function DemoOverviewPage() {
       <PageHeader
         eyebrow="Concept Tour · Static Demo"
         title="The Factory, Not the Copilot"
-        description="This is a click-through of the AI-SDLC Factory concept, built with static illustrative data so the whole idea can be seen end-to-end before the orchestration engine is built. Nothing here talks to a real backend."
+        description="This is a click-through of the Engineering Intelligence Factory concept, built with static illustrative data so the whole idea can be seen end-to-end before the orchestration engine is built. Nothing here talks to a real backend."
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">

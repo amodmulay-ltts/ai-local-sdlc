@@ -1,4 +1,4 @@
-# AI-SDLC Factory - UI Running
+# Engineering Intelligence Factory - UI Running
 
 ## Status: ✅ FULLY OPERATIONAL
 

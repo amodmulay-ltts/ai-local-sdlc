@@ -18,7 +18,7 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="text-xl font-bold text-gray-900">
-            AI-SDLC Factory
+            Engineering Intelligence Factory
           </Link>
 
           <div className="flex space-x-1">
