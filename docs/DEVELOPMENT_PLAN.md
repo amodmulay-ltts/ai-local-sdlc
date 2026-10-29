@@ -5,6 +5,8 @@ the **build order**: every feature broken into the smallest independently-testab
 unit, done strictly in sequence. Nothing in step N+1 starts until step N's test is
 green.
 
+Architecture concept: [CONCEPT.md](CONCEPT.md) is the concept-level source of truth. Its §10.1 sets the build sequence this plan follows: a first vertical slice (U1 `intent-to-requirements`), then the minimum shared runtime, then the evidence and gate model, then the wider playbook library. Each row below is labelled in CONCEPT.md §11 by status.
+
 Stack decision (from prior discussion): **Python** for everything backend — API,
 ingestion, orchestrator, model router, agents. TypeScript/Next.js frontend only starts
 once the backend API contract is stable (Milestone 11), so early milestones don't

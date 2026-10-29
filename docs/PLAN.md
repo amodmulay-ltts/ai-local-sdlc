@@ -106,6 +106,9 @@ source.visibility = 'org-shared' AND source.id IN project.linked_shared_sources`
   status callback to UI (progress, per-file errors surfaced, not swallowed).
 
 ### 3.2 Orchestrator & agents
+
+> **Note (see [CONCEPT.md §12](CONCEPT.md), conflict 1):** the playbook format and runtime interface are framework-neutral. LangGraph is one permitted implementation behind the engine, not a dependency of playbook definitions. The choice is made at M5.
+
 Use a graph-based orchestrator (LangGraph, or a small custom state machine if you want
 zero extra dependency) so each Playbook step is a node with explicit inputs/outputs,
 retries, and a visible trace. Baseline agent roles for the requirements playbook:

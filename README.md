@@ -4,8 +4,8 @@ An AI-powered Software Development Lifecycle system that turns raw project mater
 
 **Repository:** https://github.com/amodmulay-ltts/ai-local-sdlc.git
 
-See [PLAN.md](PLAN.md) for the full architecture and vision.
-See [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md) for the atomic build order.
+See [PLAN.md](docs/PLAN.md) for the full architecture and vision.
+See [DEVELOPMENT_PLAN.md](docs/DEVELOPMENT_PLAN.md) for the atomic build order.
 
 ## Quick Start
 
@@ -111,14 +111,14 @@ make run
 │   └── playbooks/     # Playbook definitions and execution
 ├── tests/             # Test suite
 ├── alembic/           # Database migrations
-├── PLAN.md            # Architecture and vision document
-├── DEVELOPMENT_PLAN.md # Atomic build order
+├── docs/PLAN.md            # Architecture and vision document
+├── docs/DEVELOPMENT_PLAN.md # Atomic build order
 └── pyproject.toml     # Python project configuration
 ```
 
 ## Build Milestones
 
-See [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md) for the detailed breakdown:
+See [DEVELOPMENT_PLAN.md](docs/DEVELOPMENT_PLAN.md) for the detailed breakdown:
 
 - **M0** — Repo & tooling bootstrap ✓ (in progress)
 - **M1** — Core data model: Project, ModelProfile, KnowledgeSource
@@ -148,4 +148,4 @@ Apache 2.0
 
 ## Contributing
 
-See the build milestones in [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md). Each row is an atomic, independently-tested unit. Nothing moves to the next step until the current step's tests are green.
+See the build milestones in [DEVELOPMENT_PLAN.md](docs/DEVELOPMENT_PLAN.md). Each row is an atomic, independently-tested unit. Nothing moves to the next step until the current step's tests are green.

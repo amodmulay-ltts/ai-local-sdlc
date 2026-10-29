@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "ai-local-sdlc"
 version = "0.1.0"
 description = "AI-powered Software Development Lifecycle factory: KB → requirements → judge → traceability"
-readme = "PLAN.md"
+readme = "docs/PLAN.md"
 requires-python = ">=3.10"
 authors = [
     { name = "AI SDLC Team", email = "amod.mulay@ltts.com" }

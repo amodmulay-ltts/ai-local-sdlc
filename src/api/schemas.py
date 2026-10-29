@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, model_validator, validator
 
 
 # Project schemas
@@ -118,7 +118,17 @@ class ModelProfileBase(BaseModel):
 class ModelProfileCreate(ModelProfileBase):
     """Schema for creating a ModelProfile."""
 
-    pass
+    # Model-level check: a field-level @validator is skipped when the field is
+    # omitted (Pydantic v2 does not run validators on defaults), so a cloud
+    # profile without api_key_ref would otherwise pass silently.
+    @model_validator(mode="after")
+    def require_api_key_for_cloud(self):
+        """Cloud providers must reference an API key unless marked local."""
+        if self.provider in ["anthropic", "openai"] and not self.is_local and not self.api_key_ref:
+            raise ValueError(
+                f"Cloud provider '{self.provider}' requires api_key_ref or must be marked is_local=true"
+            )
+        return self
 
 
 class ModelProfileUpdate(BaseModel):
