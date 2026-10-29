@@ -7,11 +7,11 @@ import Sidebar from '@/components/Sidebar';
 
 export default function RootLayoutClient({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const isDemo = pathname?.startsWith('/demo');
+  const isIllustrative = pathname?.startsWith('/factory');
 
-  if (isDemo) {
-    // The demo tour is a self-contained, full-bleed experience with its own
-    // navigation (DemoNav) — it does not use the app shell/sidebar.
+  if (isIllustrative) {
+    // The concept view is a self-contained, full-bleed experience with its own
+    // navigation (OverviewNav) — it does not use the app shell/sidebar.
     return <ThemeProvider>{children}</ThemeProvider>;
   }
 

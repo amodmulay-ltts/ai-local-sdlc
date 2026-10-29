@@ -16,7 +16,8 @@ export default function LifecycleStrip({ compact = false }: { compact?: boolean 
                 <div className="flex-1 h-px bg-gradient-to-r from-cyan-500/60 dark:from-cyan-400/60 to-slate-300 dark:to-slate-700" />
               )}
             </div>
-            <p className={`mt-3 font-semibold text-slate-900 dark:text-slate-100 ${compact ? 'text-xs' : 'text-sm'}`}>
+            <p className="mt-3 text-xs font-mono font-semibold text-cyan-700 dark:text-cyan-400">{stage.playbook}</p>
+            <p className={`font-semibold text-slate-900 dark:text-slate-100 ${compact ? 'text-xs' : 'text-sm'}`}>
               {stage.name}
             </p>
             {!compact && (

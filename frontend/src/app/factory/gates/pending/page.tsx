@@ -132,7 +132,7 @@ export default function GateDecisionPage() {
       ) : (
         <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-xl p-5">
           <p className="text-emerald-700 dark:text-emerald-400 font-semibold text-sm mb-1">
-            ✅ Decision recorded (demo only — nothing was actually submitted)
+            ✅ Decision recorded (illustrative only — nothing was submitted)
           </p>
           <p className="text-sm text-slate-600 dark:text-slate-400 dark:text-slate-300 whitespace-pre-line">{note}</p>
           <button onClick={() => setSubmitted(false)} className="mt-3 text-xs text-slate-600 dark:text-slate-400 hover:text-white underline">

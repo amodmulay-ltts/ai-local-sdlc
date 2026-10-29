@@ -1,47 +1,42 @@
-// Static, hand-authored demo content for the Engineering Intelligence Factory concept tour.
+// Hand-authored illustrative content for the Engineering Intelligence Factory concept.
 // Nothing here calls the API — this route exists purely to visualize the
 // end-to-end concept (Lifecycle, Playbooks, Agents, Gates, Evidence) before
 // the real orchestration engine (M4+) exists.
 
 export type Status = 'success' | 'running' | 'waiting' | 'escalated' | 'idle';
 
+// The V-cycle (docs/FACTORY_DEMO_DESIGN.md §2.3): each stage is one playbook. The left arm
+// specifies, the bottom builds, and the right arm verifies the left.
 export const lifecycleStages = [
-  {
-    name: 'Intent Definition',
-    agents: ['Intent Agent', 'Domain Analysis'],
-  },
-  {
-    name: 'Requirements',
-    agents: ['Requirements Agent', 'Review A/B/C', 'Judge Agent'],
-  },
-  {
-    name: 'Architecture',
-    agents: ['Design Agent', 'Planning Agent', 'Architecture Review'],
-  },
-  {
-    name: 'Implementation',
-    agents: ['Code Gen Agent', 'Refactor Agent', 'Review Agent'],
-  },
-  {
-    name: 'Validation',
-    agents: ['Test Gen Agent', 'Security Review', 'Quality Gate'],
-  },
-  {
-    name: 'Deployment',
-    agents: ['Deploy Agent', 'Gate Agent', 'Verify Agent'],
-  },
-  {
-    name: 'Feedback',
-    agents: ['Observe Agent', 'Learn Agent', 'Adapt Agent'],
-  },
+  { name: 'Requirements', playbook: 'U1', agents: ['Retrieval', 'SpecWriter', 'Judge', 'Human gate'] },
+  { name: 'Architecture', playbook: 'U2', agents: ['SpecWriter', 'Reviewers'] },
+  { name: 'Detailed design', playbook: 'U3', agents: ['SpecWriter', 'Reviewers'] },
+  { name: 'Implementation', playbook: 'U4', agents: ['Builder', 'Reviewers'] },
+  { name: 'Unit verification', playbook: 'U5–U6', agents: ['Builder', 'Gate: tests pass'] },
+  { name: 'Integration verification', playbook: 'U7', agents: ['Builder', 'Gate: tests pass'] },
+  { name: 'System validation', playbook: 'U8', agents: ['Judge', 'Human gate'] },
+  { name: 'Change impact', playbook: 'U9', agents: ['Orchestrator', 'Judge', 'Human gate'] },
 ];
 
+// Supporting terms, from docs/CONCEPT.md §3 and §8. Playbook, Agent, Gate, and Evidence are
+// explained on the overview page itself.
+export const coreTerms: Array<{ term: string; meaning: string }> = [
+  { term: 'Project', meaning: 'The scope for knowledge, model policy, and runs. One product per project.' },
+  { term: 'Run', meaning: 'One execution of a playbook. Each run keeps its source references and produces evidence.' },
+  { term: 'Orchestrator', meaning: 'Runs playbook steps in order, routes work to agents, enforces gates, and caps rework.' },
+  { term: 'Approver', meaning: 'Applies the project risk policy. Passes low risk automatically and escalates the rest. Never merges on its own.' },
+];
+
+// Illustrative numbers. Cost is $0 for local models; tokens are the real measure.
 export const factoryStats = {
-  activePlaybooks: { total: 5, running: 3, waitingOnGate: 1, completed: 1 },
-  agents: { total: 12, active: 7, idle: 5, failed: 0 },
-  pendingDecisions: 1,
-  costThisWeek: 847.34,
-  costRangeLabel: 'Typical: $650–$800',
+  runs: { total: 12, active: 3, waitingOnGate: 1, completed: 8 },
+  agents: { total: 7, active: 3, idle: 4, failed: 0 },
+  pendingApprovals: 1,
+  autonomyRate: 0.72,
+  medianCycleTime: '2h 40m',
+  tokensThisWeek: 1840000,
+  costThisWeek: 0,
+  costRangeLabel: 'Local models: $0. Tokens are logged per call.',
 };
 
 export const recentActivity: Array<{
@@ -54,91 +49,157 @@ export const recentActivity: Array<{
   href: string;
 }> = [
   {
-    project: 'Enterprise Cloud Platform',
-    playbook: 'requirements-from-mixed-sources',
+    project: 'Field Service Mobile App',
+    playbook: 'U1 intent-to-requirements',
     status: 'success',
     statusLabel: 'Done (2h)',
-    detail: '237 requirements, 3 independent reviews, human approved',
-    meta: 'Sarah Chen approved 1h ago',
-    href: '/demo/evidence/requirements-run',
+    detail: '237 requirements, 3 independent reviews, judge passed, human approved',
+    meta: 'Approved by the Tech Lead 1h ago',
+    href: '/factory/evidence/requirements-run',
   },
   {
     project: 'Field Service Mobile App',
-    playbook: 'code-generation-from-spec',
+    playbook: 'U4 design-to-implementation',
     status: 'running',
     statusLabel: 'Running',
-    detail: 'Generated 8,200 LOC · Review A done · Review B in 3m',
-    meta: 'Agents: CodeGen (done), Refactor (done), Review A–C',
-    href: '/demo/runs/live',
+    detail: 'Builder wrote the scheduling slice · Security and code reviews in progress',
+    meta: 'Agents: Builder (done), Reviewers (2 of 4 done)',
+    href: '/factory/runs/live',
   },
   {
     project: 'Billing Reconciliation Service',
-    playbook: 'test-gen-and-validation',
+    playbook: 'U5 unit-verification',
     status: 'waiting',
     statusLabel: 'Gate',
-    detail: 'Generated 587 tests, 99.1% pass',
-    meta: 'Judge flagged 2 disagreements — awaiting decision',
-    href: '/demo/gates/pending',
+    detail: '587 unit tests, 99.1% pass',
+    meta: 'Judge flagged 2 disagreements, awaiting decision',
+    href: '/factory/gates/pending',
   },
   {
     project: 'Partner Integration Gateway',
-    playbook: 'deploy-and-monitor',
+    playbook: 'U9 change-impact',
     status: 'success',
     statusLabel: 'Done (4h)',
-    detail: '47 agent steps ran, 0 escalations, production healthy',
+    detail: 'A changed requirement traced to 14 affected artifacts, 0 escalations',
     meta: 'Completed 6h ago',
-    href: '/demo/factory',
+    href: '/factory/traceability',
   },
 ];
 
-export const playbookLibrary = {
-  recommended: [
+export interface LibraryPlaybook {
+  id: string;
+  code: string;
+  title: string;
+  vStage: string;
+  description: string;
+  agents: string[];
+  gate: string;
+  verifiedBy: string;
+  href?: string;
+}
+
+// The V-cycle playbook library (docs/FACTORY_DEMO_DESIGN.md §2.3).
+// Every entry is designed, not runnable: the orchestrator (M5) and playbook engine (M6) are not built.
+// U1 is the first vertical slice (docs/CONCEPT.md §10.1).
+export const playbookLibrary: { firstSlice: LibraryPlaybook; vCycle: LibraryPlaybook[] } = {
+  firstSlice: {
+    id: 'intent-to-requirements',
+    code: 'U1',
+    title: 'Intent to Requirements',
+    vStage: 'Left · stakeholder needs → system requirements',
+    description: 'Turns a stakeholder brief and knowledge sources into numbered requirements, checked by an independent judge.',
+    agents: ['Retrieval (local-fast)', 'SpecWriter (local-strong)', 'Judge (different model family)', 'Approver'],
+    gate: 'Human approval when uncertainty is above threshold',
+    verifiedBy: 'U8 system-validation',
+    href: '/factory/playbooks/requirements-from-mixed-sources',
+  },
+  vCycle: [
     {
-      id: 'requirements-from-mixed-sources',
-      title: 'Requirements from Mixed Sources',
-      description: 'Turn business intent + knowledge sources into a reviewed requirements specification',
-      agents: ['Requirements Agent', 'Independent Review ×3', 'Judge Agent'],
-      gate: 'Human approval when uncertainty > threshold',
-      runs: 47,
-      lastRun: '2 hours ago',
+      id: 'requirements-to-architecture',
+      code: 'U2',
+      title: 'Requirements to Architecture',
+      vStage: 'Left · system → architecture',
+      description: 'Proposes components and interfaces for the adaptive cruise control (ACC) function, and allocates requirements to them.',
+      agents: ['SpecWriter (local-strong)', 'Reviewers (local-fast)'],
+      gate: 'Reviewer pass, capped at max_iterations',
+      verifiedBy: 'U7 integration-verification',
     },
-  ],
-  standard: [
     {
-      id: 'code-generation-from-architecture',
-      title: 'Code Generation from Architecture',
-      description: 'Turn an architecture design into working, reviewed code',
-      agents: ['Code Gen Agent', 'Review Agent', 'Refactor Agent', 'Test Agent'],
-      gate: 'Test coverage ≥ 85%',
-      runs: 1203,
-      lastRun: '1 hour ago',
+      id: 'architecture-to-design',
+      code: 'U3',
+      title: 'Architecture to Design',
+      vStage: 'Left · architecture → detailed design',
+      description: 'Writes the detailed design for each component: state machine, timing, and limits.',
+      agents: ['SpecWriter (local-strong)', 'Reviewers (local-fast)'],
+      gate: 'Reviewer pass',
+      verifiedBy: 'U6 design-test-plan',
     },
     {
-      id: 'test-generation-and-validation',
-      title: 'Test Generation & Validation',
-      description: 'Generate a comprehensive test suite directly from code',
-      agents: ['Test Gen Agent', 'Security Agent', 'Quality Agent', 'Judge Agent'],
-      gate: 'Security scan clear, complexity below threshold',
-      runs: 892,
-      lastRun: '3 hours ago',
+      id: 'design-to-implementation',
+      code: 'U4',
+      title: 'Design to Implementation',
+      vStage: 'Bottom · implementation',
+      description: 'The Builder writes one component slice. Reviewers check security, UX, UI, and code.',
+      agents: ['Builder (local-strong)', 'Reviewers ×4 (local-fast)'],
+      gate: 'All reviewers pass, capped at max_iterations',
+      verifiedBy: 'U5 unit-verification',
     },
-  ],
-  custom: [
     {
-      id: 'org-domain-specific-flow',
-      title: 'Our Domain-Specific Flow',
-      description: 'Custom playbook defined for this organization',
-      agents: ['Custom Analysis Agent', 'Domain-Specific Review'],
-      gate: 'Legal approval, domain expert sign-off',
-      runs: 12,
-      lastRun: '1 day ago',
+      id: 'unit-verification',
+      code: 'U5',
+      title: 'Unit Verification',
+      vStage: 'Right · unit tests',
+      description: 'Generates and runs unit tests against the detailed design.',
+      agents: ['Builder (local-strong)'],
+      gate: 'Tests pass',
+      verifiedBy: 'Gate: tests pass',
+    },
+    {
+      id: 'design-test-plan',
+      code: 'U6',
+      title: 'Design Test Plan',
+      vStage: 'Right · unit test plan',
+      description: 'Derives unit test cases from the detailed design, traceable to U3.',
+      agents: ['SpecWriter (local-strong)', 'Reviewers (local-fast)'],
+      gate: 'Reviewer pass',
+      verifiedBy: 'Reviewer',
+    },
+    {
+      id: 'integration-verification',
+      code: 'U7',
+      title: 'Integration Verification',
+      vStage: 'Right · integration tests',
+      description: 'Runs interface tests between components against the architecture.',
+      agents: ['Builder (local-strong)'],
+      gate: 'Tests pass',
+      verifiedBy: 'Gate: tests pass',
+    },
+    {
+      id: 'system-validation',
+      code: 'U8',
+      title: 'System Validation',
+      vStage: 'Right · acceptance',
+      description: 'Checks the built function against the original stakeholder intent and requirements.',
+      agents: ['Judge (local-strong)', 'Human gate'],
+      gate: 'Human approval',
+      verifiedBy: 'Human gate',
+    },
+    {
+      id: 'change-impact',
+      code: 'U9',
+      title: 'Change Impact',
+      vStage: 'Cross-cutting · feedback loop',
+      description: 'When a requirement changes, traces it through the V and lists the affected artifacts.',
+      agents: ['Orchestrator', 'Judge (local-strong)', 'Human gate'],
+      gate: 'Human approval',
+      verifiedBy: 'Human gate',
     },
   ],
 };
 
 export const playbookDetail = {
   id: 'requirements-from-mixed-sources',
-  title: 'Requirements from Mixed Sources',
+  title: 'U1 · Intent to Requirements',
   version: '2.3',
   lastModified: '2 days ago',
   owner: 'Team A',
@@ -147,7 +208,7 @@ export const playbookDetail = {
       kind: 'step' as const,
       title: 'Step 1 · Understand Business Intent',
       agent: 'Requirements Agent',
-      model: 'claude-opus (drafting profile)',
+      model: 'local-strong (drafting profile)',
       input: 'Business intent, knowledge sources',
       role: 'Analyze domain, extract scope, identify gaps',
       timeout: '300s',
@@ -157,7 +218,7 @@ export const playbookDetail = {
       kind: 'step' as const,
       title: 'Step 2 · Generate Requirements Specification',
       agent: 'Requirements Agent',
-      model: 'claude-opus (drafting profile)',
+      model: 'local-strong (drafting profile)',
       input: 'Understanding from Step 1',
       role: 'Draft complete requirements specification',
       timeout: '600s',
@@ -176,7 +237,7 @@ export const playbookDetail = {
       kind: 'step' as const,
       title: 'Step 4 · Compare & Analyze Disagreements',
       agent: 'Judge Agent',
-      model: 'claude-opus (judge profile)',
+      model: 'local-strong (judge, different model family)',
       input: 'All three review outputs',
       role: 'Identify conflicts, flag uncertainty',
       timeout: '120s',
@@ -195,7 +256,7 @@ export const playbookDetail = {
       kind: 'step' as const,
       title: 'Step 5 · Refine Based on Feedback',
       agent: 'Requirements Agent',
-      model: 'claude-opus (drafting profile)',
+      model: 'local-strong (drafting profile)',
       input: 'Original spec + judge conflict analysis',
       role: 'Address uncertainty flagged by reviewers',
       timeout: '400s',
@@ -205,138 +266,76 @@ export const playbookDetail = {
   outputs: ['requirements_spec: RequirementsOutput', 'review_evidence: ReviewOutput[]', 'uncertainty_analysis: ConflictAnalysis'],
 };
 
-interface AgentInfo {
-  icon: string;
+export interface AgentRole {
   name: string;
-  description: string;
-  runsIn: number;
-  successRate: number;
-  successCount: string;
-  avgTime: string;
-  models?: string;
-  failureModes?: string;
-  disputes?: string;
-  findings?: string;
-  escalations?: string;
-  examplePrompt?: string;
-  orchestration?: string;
+  responsibility: string;
+  profile: string;
+  milestone: string;
+  rule?: string;
 }
 
-export const agentCatalog: Array<{ stage: string; agents: AgentInfo[] }> = [
+// Agent roles from docs/FACTORY_DEMO_DESIGN.md §2.2. They are planned as Python classes in
+// src/orchestrator/ (M5–M9). None has run yet. The model layer they call (M2) is implemented.
+export const agentRoles: Array<{ group: string; agents: AgentRole[] }> = [
   {
-    stage: 'Requirements Definition',
+    group: 'Control',
     agents: [
       {
-        icon: '🎯',
-        name: 'Requirements Agent',
-        description: 'Understands intent, generates specifications',
-        runsIn: 8,
-        successRate: 94,
-        successCount: '412/438',
-        avgTime: '2m 34s',
-        models: 'Claude Opus, Claude Sonnet',
-        examplePrompt: 'You are a requirements analyst. Analyze the business intent and knowledge sources to generate clear, testable requirements. Use EARS format. Trace each requirement to its source.',
-        orchestration: 'Runs first in sequence. Output feeds to independent reviewers (Compliance, Clarity, Traceability) in parallel.',
+        name: 'Orchestrator',
+        responsibility: 'Reads the playbook, runs steps in order, enforces gates, and queues work.',
+        profile: 'None (deterministic)',
+        milestone: 'M5',
+        rule: 'Every agent call is one CallLog row tagged with run_id, step_id, agent, and model_profile.',
       },
       {
-        icon: '📊',
-        name: 'Domain Analysis Agent',
-        description: 'Extracts domain rules and constraints',
-        runsIn: 3,
-        successRate: 100,
-        successCount: '87/87',
-        avgTime: '1m 12s',
-        models: 'Claude Sonnet',
+        name: 'Approver',
+        responsibility: 'Applies the risk level. Auto-passes low risk and escalates the rest.',
+        profile: 'None (rule-based)',
+        milestone: 'M9',
+        rule: 'Never merges on its own.',
+      },
+      {
+        name: 'Human gate',
+        responsibility: 'Blocks the run until a person approves in the dashboard.',
+        profile: 'None',
+        milestone: 'M9',
+        rule: 'The run stops here and waits for an approval click.',
       },
     ],
   },
   {
-    stage: 'Code Generation & Implementation',
+    group: 'Work',
     agents: [
       {
-        icon: '💻',
-        name: 'Code Generation Agent',
-        description: 'Writes code from architecture + requirements',
-        runsIn: 12,
-        successRate: 87,
-        successCount: '1203/1381',
-        avgTime: '3m 47s',
-        models: 'Claude Opus',
-        failureModes: 'Syntax (31), Undefined refs (24)',
+        name: 'SpecWriter',
+        responsibility: 'Turns a request into a spec: requirements and acceptance criteria.',
+        profile: 'local-strong',
+        milestone: 'M7',
       },
       {
-        icon: '🔄',
-        name: 'Refactor Agent',
-        description: 'Simplifies and optimizes code',
-        runsIn: 9,
-        successRate: 92,
-        successCount: '674/732',
-        avgTime: '1m 58s',
-        models: 'Claude Sonnet',
+        name: 'Builder',
+        responsibility: 'Produces code or artifacts for one feature slice.',
+        profile: 'local-strong, or an optional cloud profile later',
+        milestone: 'M7',
+        rule: 'A failed review sends its findings back here, capped at max_iterations.',
       },
     ],
   },
   {
-    stage: 'Validation & Review (Independent)',
+    group: 'Verification',
     agents: [
       {
-        icon: '✅',
-        name: 'Compliance Review Agent',
-        description: 'Verifies against requirements & standards',
-        runsIn: 15,
-        successRate: 96,
-        successCount: '2847/2961',
-        avgTime: '1m 24s',
-        models: 'Claude Opus',
-        disputes: '3.2%',
-        examplePrompt: 'Review these requirements for completeness. Check: all functional requirements present, all non-functional requirements quantified, acceptance criteria defined, no ambiguity. Use standard rubric.',
-        orchestration: 'Runs in parallel with Clarity and Traceability reviewers. Outputs feed to Judge Agent for conflict resolution.',
+        name: 'Reviewers',
+        responsibility: 'One per domain (security, UX, UI, code). Each returns pass or fail with findings.',
+        profile: 'local-fast, one per domain',
+        milestone: 'M8',
       },
       {
-        icon: '🚨',
-        name: 'Adversarial Review Agent',
-        description: 'Tries to break implementation, finds edge cases',
-        runsIn: 14,
-        successRate: 99,
-        successCount: '3142/3167',
-        avgTime: '2m 08s',
-        models: 'Claude Opus',
-        disputes: '8.1% (often disagrees with Compliance)',
-      },
-      {
-        icon: '🏛️',
-        name: 'Architecture Review Agent',
-        description: 'Checks compliance with system design',
-        runsIn: 10,
-        successRate: 94,
-        successCount: '1687/1793',
-        avgTime: '1m 52s',
-        models: 'Claude Sonnet',
-        disputes: '1.9%',
-      },
-      {
-        icon: '🔐',
-        name: 'Security Review Agent',
-        description: 'Identifies vulnerabilities and attack surfaces',
-        runsIn: 8,
-        successRate: 97,
-        successCount: '584/601',
-        avgTime: '2m 34s',
-        models: 'Claude Opus',
-        findings: 'Critical: 2, High: 14, Medium: 48',
-      },
-      {
-        icon: '📋',
-        name: 'Judge Agent',
-        description: 'Compares independent reviews, identifies gaps',
-        runsIn: 16,
-        successRate: 98,
-        successCount: '3214/3281',
-        avgTime: '1m 42s',
-        models: 'Claude Opus',
-        escalations: '847 (25.8%)',
-        examplePrompt: 'Analyze these three independent reviews. Where do they agree? Where do they conflict? What uncertainty remains? Compute confidence score. Flag areas needing human judgment.',
-        orchestration: 'Awaits all three parallel reviewers. Outputs analysis to conditional human gate. If uncertainty > threshold, gate triggers escalation.',
+        name: 'Judge',
+        responsibility: 'Compares independent reviews, flags disagreement, and scores uncertainty.',
+        profile: 'local-strong, from a different model family than the drafter',
+        milestone: 'M8',
+        rule: 'Two model families keep the judge independent locally. Vendor independence comes with enterprise adapters.',
       },
     ],
   },

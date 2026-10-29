@@ -32,7 +32,7 @@ export default function TraceabilityPage() {
             </dl>
           </div>
         ))}
-        <p className="text-xs text-slate-600 dark:text-slate-400 pl-1">…234 more requirements omitted from this static tour.</p>
+        <p className="text-xs text-slate-600 dark:text-slate-400 pl-1">…234 more requirements omitted from this view.</p>
       </div>
 
       <h2 className="text-sm font-semibold text-slate-600 dark:text-slate-400 dark:text-slate-300 uppercase tracking-wide mb-4">Metrics summary</h2>
