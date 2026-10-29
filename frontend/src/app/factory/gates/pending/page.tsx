@@ -1,145 +1,118 @@
-'use client';
-
-import { useState } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
-import { gateDecision } from '../../data';
+import { approvalRequest as a } from '../../data';
 
-type Choice = 'approve' | 'changes' | 'escalate' | null;
+const card = 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl';
 
-export default function GateDecisionPage() {
-  const g = gateDecision;
-  const [choice, setChoice] = useState<Choice>('approve');
-  const [note, setNote] = useState(g.approverNote);
-  const [submitted, setSubmitted] = useState(false);
+const optionStyle = [
+  'border-emerald-200 dark:border-emerald-500/30',
+  'border-slate-200 dark:border-slate-700',
+  'border-amber-200 dark:border-amber-500/30',
+  'border-red-200 dark:border-red-500/30',
+];
 
+export default function GatePage() {
   return (
     <div>
       <PageHeader
-        eyebrow="Stop 5 of 7"
-        title="Playbook Run Requires Decision"
-        description={`Playbook: ${g.playbook} · Project: ${g.project} · Waiting since ${g.waitingSince}`}
+        eyebrow={`Human gate · ${a.workOrder} · ${a.line}`}
+        title="Decision needed"
+        description="The run stopped here because the judge's uncertainty is above the threshold. A named person decides, with the evidence in front of them. The factory does not publish on its own."
       />
 
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 mb-6">
-        <h2 className="text-sm font-semibold text-slate-600 dark:text-slate-400 dark:text-slate-300 uppercase tracking-wide mb-3">Why this gate?</h2>
-        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">Step 3 (Parallel Reviews) identified disagreement:</p>
-        <div className="space-y-2 mb-4">
-          {g.reviews.map((r) => (
-            <div key={r.reviewer} className="flex items-start gap-2 text-sm">
-              <span className={r.flagged ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400'}>{r.flagged ? '⚠️' : '✅'}</span>
-              <p className="text-slate-600 dark:text-slate-400 dark:text-slate-300">
-                <span className="font-medium text-slate-800 dark:text-slate-200">{r.reviewer}:</span> &ldquo;{r.verdict}&rdquo;
-              </p>
-            </div>
-          ))}
+      {/* Why this gate opened */}
+      <div className={`${card} p-5 mb-6 flex flex-wrap items-start gap-6`}>
+        <div className="flex items-start gap-3 min-w-[16rem] flex-1">
+          <AlertTriangle size={18} className="mt-0.5 text-amber-500 shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-slate-900 dark:text-white mb-1">{a.run}</p>
+            <p className="text-xs text-slate-600 dark:text-slate-400">{a.reason}</p>
+          </div>
         </div>
-
-        <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-4 text-xs space-y-1 mb-4">
-          <p className="text-slate-600 dark:text-slate-400 dark:text-slate-300 font-semibold mb-1">Judge Agent Analysis</p>
-          <p className="text-slate-600 dark:text-slate-400">
-            Disagreement level: <span className="text-amber-700 dark:text-amber-400">{g.judgeAnalysis.disagreementLevel}</span>
-          </p>
-          <p className="text-slate-600 dark:text-slate-400">
-            Uncertainty score: <span className="text-amber-700 dark:text-amber-400">{g.judgeAnalysis.uncertaintyScore}</span> (threshold:{' '}
-            {g.judgeAnalysis.threshold})
-          </p>
-          <p className="text-slate-600 dark:text-slate-400">
-            Escalation triggered: <span className="text-amber-700 dark:text-amber-400">YES</span>
-          </p>
-        </div>
-
-        <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-lg p-3">
-          <AlertTriangle size={16} className="text-amber-700 dark:text-amber-400 mt-0.5 shrink-0" />
-          <p className="text-sm text-amber-700 dark:text-amber-200">
-            <span className="font-semibold">Recommendation:</span> {g.recommendation}
-          </p>
-        </div>
+        <dl className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs">
+          <div>
+            <dt className="text-slate-500">Uncertainty</dt>
+            <dd className="font-semibold text-amber-700 dark:text-amber-400">
+              {a.uncertainty.score.toFixed(2)} (threshold {a.uncertainty.threshold.toFixed(2)})
+            </dd>
+          </div>
+          <div>
+            <dt className="text-slate-500">Waiting</dt>
+            <dd className="text-slate-800 dark:text-slate-200">{a.waiting}</dd>
+          </div>
+          <div>
+            <dt className="text-slate-500">Risk</dt>
+            <dd className="text-slate-800 dark:text-slate-200">{a.risk}</dd>
+          </div>
+          <div>
+            <dt className="text-slate-500">Deadline</dt>
+            <dd className="text-slate-800 dark:text-slate-200">{a.deadline}</dd>
+          </div>
+        </dl>
       </div>
 
-      {!submitted ? (
-        <>
-          <h2 className="text-sm font-semibold text-slate-600 dark:text-slate-400 dark:text-slate-300 uppercase tracking-wide mb-3">Decision options</h2>
-          <div className="space-y-3 mb-6">
-            <label className="flex items-start gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-700 rounded-xl p-4 cursor-pointer">
-              <input
-                type="radio"
-                name="choice"
-                checked={choice === 'approve'}
-                onChange={() => setChoice('approve')}
-                className="mt-1 accent-cyan-500"
-              />
-              <div>
-                <p className="font-medium text-white text-sm">Approve & proceed</p>
-                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                  Accept output despite disagreement. Expert judgment that Review C findings are acceptable.
-                  Requires an approver note.
-                </p>
-              </div>
-            </label>
-            <label className="flex items-start gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-700 rounded-xl p-4 cursor-pointer">
-              <input
-                type="radio"
-                name="choice"
-                checked={choice === 'changes'}
-                onChange={() => setChoice('changes')}
-                className="mt-1 accent-cyan-500"
-              />
-              <div>
-                <p className="font-medium text-white text-sm">Request changes</p>
-                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                  Send back to the Requirements Agent to address the specific gaps reviewers flagged, then restart
-                  from Step 5.
-                </p>
-              </div>
-            </label>
-            <label className="flex items-start gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-700 rounded-xl p-4 cursor-pointer">
-              <input
-                type="radio"
-                name="choice"
-                checked={choice === 'escalate'}
-                onChange={() => setChoice('escalate')}
-                className="mt-1 accent-cyan-500"
-              />
-              <div>
-                <p className="font-medium text-white text-sm">Escalate to architect</p>
-                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                  This requires a higher-level decision. Route to Tech Lead (~1h), Architect (~4h), or both (~6h).
-                </p>
-              </div>
-            </label>
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="xl:col-span-2 space-y-6">
+          {/* Reviewer verdicts */}
+          <div className={`${card} p-5`}>
+            <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Independent reviews</h2>
+            <div className="space-y-2">
+              {a.reviews.map((rv) => (
+                <div key={rv.reviewer} className="flex items-start justify-between gap-4 text-xs border-b border-slate-100 dark:border-slate-800 pb-2 last:border-0">
+                  <p className="font-medium text-slate-800 dark:text-slate-200">{rv.reviewer}</p>
+                  <p className={rv.flagged ? 'text-amber-700 dark:text-amber-400 text-right' : 'text-slate-600 dark:text-slate-400 text-right'}>
+                    {rv.verdict}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {choice === 'approve' && (
-            <div className="mb-6">
-              <label className="text-sm font-semibold text-slate-600 dark:text-slate-400 dark:text-slate-300 mb-2 block">Approver note (mandatory)</label>
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                rows={5}
-                className="w-full bg-white dark:bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500"
-              />
+          {/* Disagreements, each with a suggested resolution */}
+          <div className={`${card} p-5`}>
+            <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-1">Where the reviews disagree</h2>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mb-4">{a.judgeSummary}</p>
+            <div className="space-y-4">
+              {a.disagreements.map((d) => (
+                <div key={d.id} className="rounded-lg border border-slate-200 dark:border-slate-800 p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[11px] font-mono font-semibold text-cyan-700 dark:text-cyan-400">{d.id}</span>
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">{d.text}</p>
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">{d.issue}</p>
+                  <p className="text-xs text-slate-700 dark:text-slate-300">
+                    <span className="font-medium">Suggested: </span>
+                    {d.suggested}
+                  </p>
+                </div>
+              ))}
             </div>
-          )}
-
-          <button
-            onClick={() => setSubmitted(true)}
-            className="px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-sm rounded-lg transition-colors"
-          >
-            {choice === 'approve' ? 'Approve & Proceed' : choice === 'changes' ? 'Request Changes' : 'Escalate'}
-          </button>
-        </>
-      ) : (
-        <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-xl p-5">
-          <p className="text-emerald-700 dark:text-emerald-400 font-semibold text-sm mb-1">
-            ✅ Decision recorded (illustrative only — nothing was submitted)
-          </p>
-          <p className="text-sm text-slate-600 dark:text-slate-400 dark:text-slate-300 whitespace-pre-line">{note}</p>
-          <button onClick={() => setSubmitted(false)} className="mt-3 text-xs text-slate-600 dark:text-slate-400 hover:text-white underline">
-            Reset
-          </button>
+          </div>
         </div>
-      )}
+
+        {/* Decision options */}
+        <div className="space-y-4">
+          <div className={`${card} p-5`}>
+            <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Decide</h2>
+            <div className="space-y-2">
+              {a.options.map((o, idx) => (
+                <div key={o.label} className={`rounded-lg border ${optionStyle[idx]} p-3`}>
+                  <p className="text-xs font-semibold text-slate-900 dark:text-white mb-0.5">{o.label}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">{o.effect}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-[11px] text-slate-500 mt-4 leading-relaxed">{a.rule}</p>
+          </div>
+
+          <div className={`${card} p-5`}>
+            <p className="text-xs text-slate-600 dark:text-slate-400 flex items-start gap-2">
+              <CheckCircle2 size={14} className="mt-0.5 shrink-0 text-emerald-500" />
+              Every decision is recorded as evidence with the approver&apos;s role and reason.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

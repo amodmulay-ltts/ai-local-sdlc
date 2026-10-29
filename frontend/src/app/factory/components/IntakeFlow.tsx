@@ -172,7 +172,7 @@ export default function IntakeFlow() {
       </div>
 
       <p className="text-xs text-slate-500 dark:text-slate-400 mt-4">
-        A human gate sits at U8 and before any write-back to a source system. Cloud profiles are optional and need project policy approval. The cloud adapter is deferred.
+        A human gate sits at U8 and before any write-back to a source system. Cloud profiles are optional and need line policy approval. The cloud adapter is deferred.
       </p>
 
       {/* Traceability */}

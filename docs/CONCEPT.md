@@ -32,12 +32,13 @@ The platform has two major parts. The interface between them is the step contrac
 Expresses *what engineering work should happen and what counts as acceptable evidence*.
 
 - Versioned playbook library.
-- Project and program configuration (standards, sources, model policy, tool permissions, risk and approval rules).
-- Project-scoped knowledge, plus explicitly shared sources.
+- Line and program configuration (standards, sources, model policy, tool permissions, risk and approval rules).
+- Line-scoped knowledge, plus explicitly shared sources.
 - Engineering lifecycle use cases: requirements, architecture, detailed design, implementation, verification, validation, change impact.
 - Requirements and artifact traceability (the evidence graph, §6).
 - Evidence-based gates and risk-based approval policy (§7).
 - Deliverables, review queues, and engineering dashboards.
+- Work orders, the inbox, and the organisation-wide floor (§4.3, §9.1).
 
 ### B. Shared agent execution foundation — runtime layer
 
@@ -70,6 +71,12 @@ These terms have fixed meanings across all documents.
 | **Gate** | A checkpoint, machine-evaluated or human, with explicit criteria and a recorded outcome. A model-generated score alone is never sufficient proof for high-risk or safety-critical acceptance. |
 | **Evidence** | The source material, artifact, tool result, test result, rationale, review record, or approval that supports a claim or a gate outcome. |
 | **Engineering baseline** | An identified, approved set of versions of requirements, designs, code, tests, and evidence. Changes are assessed against a baseline. |
+| **Factory** | The organisation-wide system: all lines, the shared playbook library, shared policy, and the floor |
+| **Line** | One product's production line: its knowledge, routing table, approvers, risk policy, and work orders. Lines are independent. Replaces the earlier term *project* (§8.1) |
+| **Work order** | One request from intake to release, with every run it spawns. It belongs to exactly one line, and its source reference is the root of traceability (§4.3) |
+| **Stage** | One step of the V-cycle on a line: one playbook (U1 requirements, U2 architecture, and so on) |
+| **Inbox** | The queue of work orders that need attention, with the stage each one is at (§4.3) |
+| **Floor** | The organisation-wide view across all lines (§9.1) |
 
 **Playbooks orchestrate capabilities through stable interfaces.** A playbook names a role and a model profile. It does not name a model, a framework, or a provider.
 
@@ -79,7 +86,7 @@ These terms have fixed meanings across all documents.
 
 A playbook step runs in this order:
 
-1. **Inputs resolved.** The orchestrator resolves declared inputs from governed knowledge and prior step outputs, using the project's configuration.
+1. **Inputs resolved.** The orchestrator resolves declared inputs from governed knowledge and prior step outputs, using the line's configuration.
 2. **Context assembled.** The runtime builds the context from allowed sources only (see §8).
 3. **Agent executes.** A bounded agent role runs through the model router, and may call tools from the permitted list.
 4. **Output validated.** The step output is checked against its declared schema. Deterministic checks run where defined (schema, lint, build, static analysis, tests).
@@ -95,7 +102,7 @@ Arrows in §5 show conceptual information and control flow. They do not imply sy
 
 Work enters the factory through intake. Intake is itself a playbook, U0 `intake-and-triage`, so it follows the same rules as every other playbook: versioned, gated, and recorded as evidence. It is the only playbook that starts from an external event.
 
-**Trigger.** An event in a source system starts U0: a chat message or reaction, an issue created or updated in a tracker, a webhook, or a schedule. Every trigger carries its source reference (system, key, and link) and is recorded before anything else happens.
+**Trigger.** An event in a source system starts U0: a chat message or reaction, an issue created or updated in a tracker, a webhook, or a schedule. Every trigger carries its source reference (system, key, and link) and is recorded before anything else happens. U0 then creates the work order (§4.3).
 
 **Nested services.** U0 contains services, not agents. Services are deterministic code. Only the classifier may call a model, and only when the rules cannot decide.
 
@@ -108,7 +115,7 @@ Work enters the factory through intake. Intake is itself a playbook, U0 `intake-
 | Router | Picks the target playbook from a configured routing table | Deterministic for a given classification. Low confidence sends the item to a gate |
 | Handoff | Starts the child run with the source reference, brief, and routing decision | The target playbook receives the handoff contract only, never the raw source |
 
-**Handoff contract.** The handoff is the only input a target playbook receives from intake: source reference, normalized brief, classification with its basis, and routing decision. A target playbook never reads the source system directly.
+**Handoff contract.** The handoff is the only input a target playbook receives from intake: source reference, normalized brief, classification with its basis, routing decision, and the id of the work order. A target playbook never reads the source system directly.
 
 **Chaining.** Playbooks chain by emitting events, not by nesting. When U1 `intent-to-requirements` completes, it emits an event that starts U2 as a child run. Every run records its parent, so one request can be followed through the whole V-cycle.
 
@@ -123,13 +130,43 @@ Every step uses the cheapest resource that can decide correctly. Four kinds of r
 | Resource | Used for | Rule |
 |---|---|---|
 | **Automation** (deterministic code) | Connectors, deduplication, normalization, routing, schema and lint checks, build, tests | Preferred whenever a rule can decide. No model call |
-| **Local model** (Ollama) | Drafting, judging, review, and the classifier's fallback for ambiguous items | The default for model work. The local-only project policy is enforced on the server (built in M2) |
-| **Cloud AI API** (Anthropic, OpenAI, Azure, or similar) | An optional profile where quality needs it, such as a Builder or a judge | Deferred until the local path is complete. Allowed only where the project policy permits. Credentials come from a secrets store, never from a playbook |
+| **Local model** (Ollama) | Drafting, judging, review, and the classifier's fallback for ambiguous items | The default for model work. The local-only line policy is enforced on the server (built in M2) |
+| **Cloud AI API** (Anthropic, OpenAI, Azure, or similar) | An optional profile where quality needs it, such as a Builder or a judge | Deferred until the local path is complete. Allowed only where the line policy permits. Credentials come from a secrets store, never from a playbook |
 | **Human** | Gates, approvals, and disputes between reviewers | Required wherever the risk policy (§7) requires it |
 
 **Order of preference.** Rules before models. Local before cloud. A person whenever the risk requires one. A step that needs a cloud profile still runs its automation checks first, and its output still passes the same gates.
 
 **Independence.** A judge uses a different model family from the drafter. With local models only, that means two families (for example Qwen and Gemma). Vendor independence comes with the cloud adapters.
+
+### 4.3 Work orders and the inbox
+
+A **work order** is one request and everything that happens to it. U0 creates it when it accepts an event from a source system, and it closes when the change is released, rejected, or cancelled. A run is one step of a work order. Each run records its work order and its parent run, so the whole journey can be followed.
+
+**What a work order holds.** Its source reference (the root of traceability), its line, and its type: feature, defect, enhancement, or change request. Its risk level, set by the line's policy. The chain of runs it has spawned. Its current stage, its state, and who it is waiting on. The evidence from all of its runs.
+
+| State | Meaning |
+|---|---|
+| Received | The event landed. Intake has not started |
+| Triaging | U0 is running: normalising, classifying, routing |
+| Queued | Routed, waiting for the next stage to start |
+| In progress | A run is working at a stage |
+| Needs a decision | A gate is open. A named person must decide |
+| Blocked | Waiting on something outside the factory: missing source information, or a failed check that cannot be retried |
+| On hold | Paused by a person, with a reason |
+| Released | The change shipped |
+| Rejected, Closed | Ended, with the reason recorded as evidence |
+
+**Rules.** A work order belongs to exactly one line. Work that touches two products becomes two work orders, one per line, linked by a *depends on* relation. Duplicates are merged, not deleted, and the merge is recorded as evidence.
+
+**The inbox** is the queue of work orders that need attention.
+
+- **Order.** Open gates come first, oldest first. A mark shows what changed since the person last looked.
+- **Columns.** Source key and title, line, type, current stage, state, time in that state, and who it is waiting on.
+- **Views.** Needs me, all, stuck, and mine. Each can be grouped by line, source, risk, or stage. Grouping by stage gives a board of the same data.
+- **Actions.** Decide a gate, assign, hold, reroute (override the router's choice of playbook), merge, split, and cancel. Every action is recorded as evidence with who, when, and why.
+- **No silent write-back.** The inbox never changes a source system without a gate (§4.1).
+
+Wireframes and the full layout are in [ORG_FACTORY_CONCEPT.md](ORG_FACTORY_CONCEPT.md) §5.
 
 ---
 
@@ -141,12 +178,12 @@ The diagram is Mermaid source embedded in this Markdown, so it renders in any Me
 flowchart TB
     HUMAN["Engineering owner / product / systems engineer"]
     INTENT["Intent, change request, constraints, acceptance criteria"]
-    CONFIG["Project and program configuration<br/>standards · source scope · model policy · risk policy"]
+    CONFIG["Line and program configuration<br/>standards · source scope · model policy · risk policy"]
 
     subgraph PRODUCT["Engineering Intelligence Factory — method and product layer"]
         LIB["Versioned playbook library"]
         PB["Playbook definition<br/>inputs · steps · dependencies · outputs · tools · gates"]
-        KNOW["Governed project knowledge<br/>documents · repositories · models · specifications"]
+        KNOW["Governed line knowledge<br/>documents · repositories · models · specifications"]
         GRAPH["Engineering evidence graph<br/>provenance · traceability · baselines · impact links"]
         POLICY["Risk and approval policy<br/>autonomy level · mandatory reviewers · prohibited actions"]
         UI["Engineering workspace<br/>run timeline · artifacts · gate results · approval queue"]
@@ -258,13 +295,13 @@ Every link records:
 
 ## 7. Risk-based autonomy and human accountability
 
-Review effort scales with risk, and each project configures the policy. The platform does not use one universal automation setting.
+Review effort scales with risk, and each line configures the policy. The platform does not use one universal automation setting.
 
-Illustrative levels. These are examples, not a substitute for a project's own safety classification or the applicable standards.
+Illustrative levels. These are examples, not a substitute for a line's own safety classification or the applicable standards.
 
 | Level | Typical work | Autonomy and checks |
 |---|---|---|
-| **Low** | Documentation, formatting | Automated execution and checks may be sufficient under project policy |
+| **Low** | Documentation, formatting | Automated execution and checks may be sufficient under line policy |
 | **Moderate** | Test generation, noncritical code changes | Agent execution with deterministic checks; human review as the policy requires |
 | **High** | Changes to system behavior or key interfaces | Independent verification, impact analysis, explicit engineering approval |
 | **Safety-critical** | Work under a safety lifecycle | Applicable safety process, controlled toolchain, traceable verification evidence, qualified review, mandatory approval gates |
@@ -277,24 +314,58 @@ Illustrative levels. These are examples, not a substitute for a project's own sa
 
 ---
 
-## 8. Project isolation and configuration boundaries
+## 8. Lines, isolation, and configuration boundaries
 
 The method and the configuration are separate, and so is each run.
 
 | Concept | What it is | Example |
 |---|---|---|
 | **Engineering method** | A reusable, versioned playbook and its process definition | `intent-to-requirements` v1 |
-| **Project or program configuration** | The applicable standards, sources, constraints, model policy, tool permissions, risk policy, and approval rules | The mobility program's standards list and "local-only" model policy |
+| **Line or program configuration** | The applicable standards, sources, constraints, model policy, tool permissions, risk policy, and approval rules | The mobility program's standards list and "local-only" model policy |
 | **Execution instance (`PlaybookRun`)** | One run, with its input snapshot, playbook version, configuration version, model profiles, outputs, events, evidence, gate outcomes, and human decisions | One run of U1 on 2026-10-20 |
 | **Engineering baseline** | Approved artifact versions and the evidence set used for change-impact analysis | The approved requirements set v1.0 |
 
 **Isolation rules.**
 
-- Knowledge is scoped to a project by default. Retrieval filters by project. Shared sources must be linked explicitly.
+- Knowledge is scoped to a line by default. Retrieval filters by line. Shared sources must be linked explicitly.
 - Information from one customer or program is never reused in another by default.
-- A project flagged "local-only" must reject any step whose model profile resolves to a cloud provider. This is enforced server-side (PLAN §3.4).
+- A line flagged "local-only" must reject any step whose model profile resolves to a cloud provider. This is enforced server-side (PLAN §3.4).
 
-**Current state.** The `Project` entity has a knowledge-scope policy field and the `KnowledgeSource` entity is linked to a project (M1, implemented). Retrieval filtering, shared-source linking, and the enforcement rules are **designed** and planned for M4 and M10. Authorization (RBAC) is planned for M10.
+**Current state.** The `Project` entity has a knowledge-scope policy field and the `KnowledgeSource` entity is linked to a project (M1, implemented). The `Project` entity is the code name for a line until a rename is built (§8.1). Retrieval filtering, shared-source linking, and the enforcement rules are **designed** and planned for M4 and M10. Authorization (RBAC) is planned for M10.
+
+### 8.1 Lines and the organisation
+
+The scope called a *project* in earlier documents is now a **line**: one product's production line, with its own knowledge, routing table, approvers, risk policy, and work orders. The **factory** is the organisation-wide system that holds all lines. The word *project* clashed with Jira and GitHub projects, which intake reads. In code, the M1 `Project` entity is the line until a rename is built.
+
+```
+Organisation
+ └─ Factory                        shared library, shared policy, the floor
+     └─ Line                       one product: knowledge, routing, approvers, risk policy
+         └─ Work order             one request, from intake to release
+             └─ Run                one playbook execution
+```
+
+| Shared across the factory | Per line |
+|---|---|
+| Playbook library, versioned. A line may pin a version or fork one under review | Knowledge sources and their visibility |
+| Model profiles and resource policy (automation, local, cloud) | Routing table: which playbook handles which request type |
+| Source connectors, registered once | Approvers and escalation paths |
+| Risk-policy templates and the minimum rules | Risk levels and gates, never looser than the factory minimum |
+| Audit and the event schema | Time targets for each state |
+
+| Role | Can do |
+|---|---|
+| Factory admin | Manage lines, shared playbooks, connectors, and policy |
+| Line owner | Configure a line: routing, approvers, targets |
+| Approver | Decide gates for the lines and risk levels assigned to them |
+| Contributor | Open and follow work orders |
+| Viewer | Read-only access |
+
+**Independence.** Lines are independent. They share no knowledge, prompts, routing, or approvers unless a source is explicitly shared. A line may be stricter than the factory policy, never looser. For example, a line can require local-only models even where the factory allows cloud profiles.
+
+**Visibility.** For now, everyone with access to the factory sees every line, including work order titles and evidence. Narrowing this by line comes with roles and permissions (M10).
+
+**Data model, at concept level.** `Organisation` and `WorkOrder` are new. `Line` renames `Project` and adds a routing table, time targets, and a tracker mapping. `PlaybookRun` gains `work_order_id` and `parent_run_id`. `Assignment` records who a work order or gate is waiting on, and `SavedView` stores an inbox filter. The run events (`run.started`, `step.finished`, `gate.result`, `call.completed`) gain `work_order_id` and `line_id`.
 
 ---
 
@@ -314,6 +385,24 @@ Three kinds of record are kept separate:
 
 **Current state.** `CallLog` is **implemented** as a table with provider, model id, token fields, estimated cost, latency, and a nullable `playbook_run_id`. The accounting wrapper writes a row for each successful call (M2 row 2.6). Calls are not yet linked to a run, because there is no `PlaybookRun` table. The event stream and artifact records are **designed** and planned (M5, M9).
 
+### 9.1 The floor: the organisation view
+
+The **floor** shows leaders where work is across every line, where it waits, and what it costs. The inbox and the floor are **views over the run events**, not separate stores. That keeps the organisation view a read-only aggregator.
+
+| Panel | What it shows |
+|---|---|
+| Flow by stage | Work orders at each stage across the organisation, with queue length and average wait. Shows where queues form, especially at gates |
+| Approval backlog | Open gates by line and by approver, oldest first |
+| Throughput | Work orders released per week, by line and type |
+| Cycle time | Median time from intake to release, by line and type |
+| Autonomy rate | Share of gate decisions passed without escalation |
+| Rework rate | Share of runs that needed rework, by stage |
+| Resources | Tokens and cost by profile, split by automation, local model, and cloud API |
+| Playbook health | Versions in use, pass rates, and lines still on an old version |
+| Change impact | Requirement changes in the period and the artifacts they touched |
+
+Every number links to the work orders behind it: floor, then line, then work order, then evidence. Visibility follows §8.1. The detailed layout is in [ORG_FACTORY_CONCEPT.md](ORG_FACTORY_CONCEPT.md) §6.
+
 ---
 
 ## 10. Roadmap and non-goals
@@ -326,6 +415,7 @@ Each step is an increment, and each is measured before the next begins.
 2. **Minimum shared runtime.** The model provider interface (Ollama first), the playbook step contract, orchestration state, structured run events, and the controlled tool interface. Ollama-first follows the existing direction (PLAN §3.4 and `.env.example`).
 3. **Evidence and gate model.** Persist artifact versions, source provenance, test outcomes, gate criteria and results, and human decisions. Add the links needed for change-impact analysis.
 4. **Expand the playbook library.** Only after the first slice is measurable and repeatable: requirements, architecture, detailed design, implementation, verification, validation, and change impact (U2–U9).
+5. **Organisation layer.** Work orders and links on runs, the inbox for one line, inbox actions, the floor for one line, organisation roll-ups, and cross-line links. Each is built and checked on its own. Roll-ups across lines need roles and permissions (M10).
 
 **Mapping to the existing milestones** ([DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md)):
 
@@ -336,6 +426,7 @@ Each step is an increment, and each is measured before the next begins.
 | Minimum shared runtime | M2, M5 |
 | Evidence and gate model | M8, M9 |
 | Playbook library expansion | Post-M9, after measurement. Not yet scheduled |
+| Organisation layer (work orders, inbox, floor) | After M5 and U0. Roll-ups across lines need M10. Not yet scheduled |
 
 ### 10.2 Measures of success
 
@@ -382,6 +473,7 @@ Do not use lines of generated code, number of agents, or token volume as primary
 | Embedding and retrieval (M4) | **Planned / not implemented** | |
 | Orchestrator and agent framework (M5), playbook engine (M6) | **Planned / not implemented** | `src/orchestrator/` and `src/playbooks/` are empty packages |
 | Intake and triggers (U0, §4.1) | **Designed / specified** | Not built. Source connectors and the routing table come after the first vertical slice |
+| Line, work order, inbox, and floor (§4.3, §8.1, §9.1) | **Designed / specified** | Not built. The M1 `Project` entity is the code name for a line until a rename is built |
 | Agents, judge, traceability (M7–M9) | **Planned / not implemented** | |
 | Auth, RBAC, cross-project governance (M10) | **Planned / not implemented** | |
 | Demo (use-case playbook library, dashboard, token panel) | **Designed / specified** | [FACTORY_DEMO_DESIGN.md](FACTORY_DEMO_DESIGN.md). Not built |
@@ -406,6 +498,10 @@ These are the places where the new architecture meets an existing decision. Each
 | 5 | PLAN §2 calls the run record `PlaybookRun`. The target brief calls it an execution instance | Two names for one concept | Use `PlaybookRun` as the name for the execution instance (§8) |
 | 6 | PLAN §2 traceability via `source_refs[]` on requirements | The brief asks for a typed, versioned evidence graph | `source_refs[]` stays as the first, simple form. The typed graph is a planned generalisation in M9. Each link records provenance, version, and assertion type (§6) |
 | 7 | ARCHITECTURE §5 lists Evidence, Agent, and Gate as entities | PLAN §2 does not define them as tables | Keep them as planned entities. They are added with the evidence and gate model (§10.1 step 3) |
+| 8 | PLAN §2 and the early concept call the scope a "project" | The word clashes with Jira and GitHub projects that intake reads, and says nothing about the factory idea | Use **line**. The `Project` entity stays in code until a rename is built (§8.1) |
+| 9 | The V-cycle uses "stage"; a draft proposed "station" | Two words for one idea | Keep **stage** |
+| 10 | FACTORY_DEMO_DESIGN §2.5: an organisation view aggregates "factory instances" | Instances per project were never defined | The factory is the organisation-wide system. Lines are independent, and a work order belongs to exactly one line (§8.1) |
+| 11 | §8 isolation, against an organisation-wide view | Isolating content is different from limiting visibility | Lines share nothing by default. For now everyone with factory access sees every line. Narrowing by line comes with roles and permissions (M10) |
 
 ### 12.1 Operating-model lessons from other factory products
 
@@ -413,7 +509,7 @@ Other products run software work as a team of agents connected to repositories, 
 
 | Lesson | How this concept applies it | Decision |
 |---|---|---|
-| Group repositories that ship together into one project. Keep separate products in separate projects | Project scope (§8). Do not split one product by team or task; specialise with agent roles and skills instead | Adopt |
+| Group repositories that ship together into one line. Keep separate products in separate lines | Line scope (§8). Do not split one product by team or task; specialise with agent roles and skills instead | Adopt |
 | Keep the originating request with the run from intake to handoff | A run (`PlaybookRun`, §8) keeps a reference to its source (issue, thread, or document) through to the evidence package (§6) | Adopt |
 | Connect external intake sources such as chat, issue trackers, and webhooks | Intake playbook U0 with nested services (§4.1) | Adopt as a playbook. Its build follows the first vertical slice (§10.1) |
 | A coordinating agent that can skip stages or send work back | Orchestrator (M5) with rework capped by `max_iterations`. Every reroute is recorded as evidence | Adopt, with the cap and the record |
@@ -440,6 +536,13 @@ Other products run software work as a team of agents connected to repositories, 
 6. **Enterprise adapter order:** which provider comes first after Ollama (Anthropic, OpenAI, Azure OpenAI, or Bedrock)?
 7. **Playbook authoring:** YAML first, or a visual builder? (ARCHITECTURE §12.)
 8. **Work intake:** resolved. Intake is playbook U0 with nested services (§4.1). Which source system is connected first is a delivery decision, not a design question.
+9. **"Work order."** Is it the right word for a request's whole journey? It has not been confirmed.
+10. **Inbox ownership.** A personal queue, a shared queue per line, or both?
+11. **Time targets.** Who sets the target time for each state: the factory, or each line?
+12. **Default scopes at M10.** When visibility narrows, what is the default for each role?
+13. **Tenancy.** One organisation per deployment, or several?
+14. **Merging and splitting.** What rules decide that two requests are the same work order?
+15. **Sizing.** How many lines should one factory expect? The answer sets how much the floor must filter.
 
 ---
 
@@ -450,3 +553,4 @@ Other products run software work as a team of agents connected to repositories, 
 - [FACTORY_DEMO_DESIGN.md](FACTORY_DEMO_DESIGN.md): demo design and use-case playbooks.
 - [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md): atomic, test-gated build order.
 - [DEV_WORKFLOW.md](DEV_WORKFLOW.md): how each build step is developed and tested.
+- [ORG_FACTORY_CONCEPT.md](ORG_FACTORY_CONCEPT.md): wireframes and the detailed panel list for the line, work order, inbox, and floor. Folded into §4.3, §8.1, and §9.1.

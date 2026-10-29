@@ -1,111 +1,132 @@
-import type { CSSProperties } from 'react';
-
-// Three ways the same team can work, with illustrative numbers. The point is what happens to
-// review when output rises: without a change in how review works, the queue absorbs the gain.
-
-// The SDLC as one line. Changes enter at the left and move right. Review is one stage among
-// the others, but it clears changes at the rate of a person, so the pile forms there.
+// How the same SDLC flows in three eras. Each dot is one change. Each lane is one era, and its
+// colour matches the card for that era below. Illustrative, not measured.
 
 const stages = ['Requirements', 'Design', 'Build', 'Test', 'Review', 'Release'];
 const REVIEW = 4;
 
-// Seven changes wait at review in a pile; three pass straight through to release.
-const dots = Array.from({ length: 10 }, (_, k) => {
-  if (k < 7) {
-    const row = Math.floor(k / 2);
-    return {
-      endLeft: `${74 + (k % 2) * 4}%`,
-      endTop: `calc(50% - ${10 + row * 12}px)`,
-      kind: 'queued' as const,
-    };
-  }
-  return { endLeft: '100%', endTop: 'calc(50% - 5px)', kind: 'passed' as const };
-});
+// One SVG for all three lanes. Each dot is placed on its lane's line by its own coordinates, so it
+// cannot drift out of its lane. Illustrative, not measured.
+const VIEW_W = 1000;
+const TRACK_X0 = 230;
+const TRACK_X1 = 910;
+const LANE_GAP = 64;
+const laneY = (i: number) => 70 + i * LANE_GAP;
+const stageX = (pct: number) => TRACK_X0 + (pct / 100) * (TRACK_X1 - TRACK_X0);
 
-const keyframes = `
-@keyframes sdlc-flow {
-  0% { left: 0%; top: calc(50% - 5px); opacity: 0; }
-  8% { opacity: 1; }
-  45% { left: var(--end-left); top: var(--end-top); opacity: 1; }
-  90% { left: var(--end-left); top: var(--end-top); opacity: 1; }
-  100% { left: var(--end-left); top: var(--end-top); opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .sdlc-dot { animation: none !important; left: var(--end-left); top: var(--end-top); opacity: 1; }
-}
-`;
+type Dot = { endPct: number; delay: number };
+
+// Without AI: a few changes, each read by a person, and they flow steadily through review.
+const withoutAi: Dot[] = Array.from({ length: 3 }, (_, k) => ({ endPct: 100, delay: k * 2.2 }));
+
+// AI, and people still read everything: many changes, and most wait in a pile at review.
+const aiWithHumans: Dot[] = [
+  ...Array.from({ length: 7 }, (_, k) => ({ endPct: 70 + k * 2, delay: k * 0.7 })),
+  ...Array.from({ length: 3 }, (_, k) => ({ endPct: 100, delay: 5 + k * 0.7 })),
+];
+
+// AI, with a factory: many changes, checked by machines and independent reviewers, so they clear
+// review without queueing. Only a few reach a person at the gate.
+const factory: Dot[] = [
+  ...Array.from({ length: 8 }, (_, k) => ({ endPct: 100, delay: k * 0.6 })),
+  ...Array.from({ length: 2 }, (_, k) => ({ endPct: REVIEW * 20, delay: 5 + k * 0.6 })),
+];
+
+const eras = [
+  {
+    key: 'without',
+    lines: ['Without AI'],
+    dotFill: 'fill-slate-400 dark:fill-slate-500',
+    textFill: 'fill-slate-600 dark:fill-slate-400',
+    dots: withoutAi,
+  },
+  {
+    key: 'ai',
+    lines: ['AI, and people', 'still read everything'],
+    dotFill: 'fill-amber-500 dark:fill-amber-400',
+    textFill: 'fill-amber-700 dark:fill-amber-400',
+    dots: aiWithHumans,
+  },
+  {
+    key: 'factory',
+    lines: ['AI, with a factory'],
+    dotFill: 'fill-emerald-500 dark:fill-emerald-400',
+    textFill: 'fill-emerald-700 dark:fill-emerald-400',
+    dots: factory,
+  },
+];
 
 function SdlcFlow() {
+  const height = laneY(eras.length - 1) + 40;
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 mb-4">
-      <style>{keyframes}</style>
-      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-500 mb-4">
-        The SDLC as one line: each dot is a change
+      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-500 mb-2">
+        The SDLC as one line, in three eras: each dot is a change
       </p>
-      <div className="relative h-36 mx-10">
-        {/* Track */}
-        <div className="absolute left-0 right-0 top-1/2 h-px bg-slate-300 dark:bg-slate-700" />
-
-        {/* Stage nodes and labels */}
+      <svg viewBox={`0 0 ${VIEW_W} ${height}`} className="w-full h-auto" role="img" aria-label="Three lanes showing changes flowing through the SDLC without AI, with AI and people reading everything, and with a factory">
+        {/* Stage names */}
         {stages.map((name, i) => (
-          <div key={name} className="absolute top-1/2" style={{ left: `${i * 20}%` }}>
-            <div
-              className={`-translate-x-1/2 -translate-y-1/2 h-3 w-3 rounded-full border-2 ${
-                i === REVIEW
-                  ? 'border-amber-500 dark:border-amber-400 bg-amber-100 dark:bg-amber-500/30'
-                  : 'border-slate-400 dark:border-slate-500 bg-white dark:bg-slate-900'
-              }`}
-            />
-            <p
-              className={`absolute top-5 -translate-x-1/2 whitespace-nowrap text-xs ${
-                i === REVIEW ? 'font-semibold text-amber-700 dark:text-amber-400' : 'text-slate-600 dark:text-slate-400'
-              }`}
-            >
-              {name}
-            </p>
-          </div>
+          <text
+            key={name}
+            x={stageX(i * 20)}
+            y={28}
+            textAnchor="middle"
+            className={i === REVIEW ? 'fill-slate-900 dark:fill-white text-[14px] font-semibold' : 'fill-slate-500 dark:fill-slate-400 text-[13px]'}
+          >
+            {name}
+          </text>
         ))}
 
-        {/* Queue label */}
-        <p
-          className="absolute -translate-x-1/2 whitespace-nowrap text-[11px] font-semibold text-amber-700 dark:text-amber-400"
-          style={{ left: `${REVIEW * 20 - 6}%`, top: 'calc(50% - 108px)' }}
-        >
-          The queue forms here
-        </p>
+        {eras.map((era, li) => {
+          const y = laneY(li);
+          return (
+            <g key={era.key}>
+              {/* Lane name */}
+              {era.lines.map((ln, k) => (
+                <text key={ln} x={0} y={y + 4 + (k - (era.lines.length - 1) / 2) * 16} className={`${era.textFill} text-[13px] font-semibold`}>
+                  {ln}
+                </text>
+              ))}
 
-        {/* Animated changes */}
-        {dots.map((d, k) => (
-          <span
-            key={k}
-            className={`sdlc-dot absolute h-2.5 w-2.5 rounded-full ${
-              d.kind === 'queued' ? 'bg-amber-500 dark:bg-amber-400' : 'bg-emerald-500 dark:bg-emerald-400'
-            }`}
-            style={
-              {
-                '--end-left': d.endLeft,
-                '--end-top': d.endTop,
-                left: 0,
-                top: 'calc(50% - 5px)',
-                animation: `sdlc-flow 9s linear ${-k * 0.9}s infinite`,
-              } as CSSProperties
-            }
-          />
-        ))}
-      </div>
-      <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-        Changes arrive faster than people can review them, so most wait at Review. Only the few that clear review reach
-        Release. Speed up every stage before Review and the pile grows faster.
+              {/* Track and stage ticks */}
+              <line x1={TRACK_X0} y1={y} x2={TRACK_X1} y2={y} strokeWidth={1} className="stroke-slate-300 dark:stroke-slate-700" />
+              {stages.map((name, i) => (
+                <line
+                  key={name}
+                  x1={stageX(i * 20)}
+                  x2={stageX(i * 20)}
+                  y1={y - 6}
+                  y2={y + 6}
+                  strokeWidth={i === REVIEW ? 2 : 1.5}
+                  className={i === REVIEW ? 'stroke-slate-700 dark:stroke-slate-200' : 'stroke-slate-400 dark:stroke-slate-600'}
+                />
+              ))}
+
+              {/* Changes: each moves from Requirements to its end point on this lane */}
+              {era.dots.map((d, k) => {
+                const endX = stageX(d.endPct);
+                return (
+                  <circle key={k} r={5} cx={TRACK_X0} cy={y} className={era.dotFill}>
+                    <animate attributeName="cx" values={`${TRACK_X0};${endX};${endX}`} keyTimes="0;0.45;1" calcMode="linear" dur="9s" begin={`${-d.delay}s`} repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.08;0.9;1" dur="9s" begin={`${-d.delay}s`} repeatCount="indefinite" />
+                  </circle>
+                );
+              })}
+            </g>
+          );
+        })}
+      </svg>
+      <p className="text-xs text-slate-600 dark:text-slate-400 mt-4 leading-relaxed">
+        Without AI, a few changes flow and a person reads each one. With AI and people still reading everything, far more
+        changes arrive, and most wait in a pile at Review. In the factory, checks run before review, so changes clear
+        without queueing, and only a few reach a person at the gate.
       </p>
     </div>
   );
 }
 
-const MAX = 40;
-
 const scenarios = [
   {
-    title: 'Before AI',
+    title: 'Without AI',
     summary: 'The team writes the code and a person reads every change.',
     rows: [
       { label: 'Changes produced per day', value: 3 },
@@ -138,6 +159,8 @@ const scenarios = [
     tone: 'positive' as const,
   },
 ];
+
+const MAX = 40;
 
 const toneBar = {
   neutral: 'bg-slate-400 dark:bg-slate-500',

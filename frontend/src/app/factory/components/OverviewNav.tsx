@@ -7,7 +7,11 @@ import { useTheme } from '@/providers/ThemeProvider';
 
 const LINKS = [
   { href: '/factory', label: 'Overview' },
-  { href: '/factory/dashboard', label: 'Factory Dashboard' },
+  { href: '/factory/floor', label: 'Floor' },
+  { href: '/factory/lines', label: 'Lines' },
+  { href: '/factory/inbox', label: 'Inbox' },
+  { href: '/factory/cost', label: 'Cost' },
+  { href: '/factory/setup', label: 'Setup' },
   { href: '/factory/playbooks', label: 'Playbooks' },
   { href: '/factory/agents', label: 'Agents' },
   { href: '/factory/runs/live', label: 'Live Run' },
@@ -36,25 +40,6 @@ export default function OverviewNav() {
             </div>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-1 overflow-x-auto">
-            {LINKS.map((link) => {
-              const active = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`px-3 py-2 text-sm rounded-md whitespace-nowrap transition-colors ${
-                    active
-                      ? 'text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-400/10'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-          </nav>
-
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={toggleTheme}
@@ -75,15 +60,15 @@ export default function OverviewNav() {
           </div>
         </div>
 
-        {/* Mobile nav */}
-        <nav className="lg:hidden flex items-center gap-1 pb-3 overflow-x-auto">
+        {/* Navigation: one row that wraps, so no horizontal scrollbar */}
+        <nav className="flex flex-wrap items-center gap-x-1 gap-y-1 pb-3">
           {LINKS.map((link) => {
             const active = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-1.5 text-xs rounded-md whitespace-nowrap transition-colors ${
+                className={`px-2.5 py-1.5 text-xs rounded-md whitespace-nowrap transition-colors ${
                   active
                     ? 'text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-400/10'
                     : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'

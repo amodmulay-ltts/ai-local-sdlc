@@ -9,10 +9,13 @@ import {
   GitBranch,
   ArrowRight,
   RotateCcw,
+  Inbox,
+  Layers,
 } from 'lucide-react';
 import IntakeFlow from './components/IntakeFlow';
 import VCycle from './components/VCycle';
 import ReviewBottleneck from './components/ReviewBottleneck';
+import FlatVCycle from './components/FlatVCycle';
 import AILadder from './components/AILadder';
 import PageHeader from './components/PageHeader';
 import { coreTerms } from './data';
@@ -63,10 +66,22 @@ const stepFlow = [
 
 const exploreViews = [
   {
-    href: '/factory/dashboard',
+    href: '/factory/floor',
     icon: LayoutDashboard,
-    title: 'Factory dashboard',
-    description: 'Runs in progress, the approval queue, autonomy, cycle time, and tokens.',
+    title: 'The floor',
+    description: 'Every line in one view: where work waits, the approval backlog, cycle time, autonomy, and cost.',
+  },
+  {
+    href: '/factory/inbox',
+    icon: Inbox,
+    title: 'Inbox',
+    description: 'Every work order across the factory, with the stage each one is at and what needs a decision.',
+  },
+  {
+    href: '/factory/setup',
+    icon: Layers,
+    title: 'Setup',
+    description: 'How a playbook, line, agent, and trigger are created, and how they connect into one system.',
   },
   {
     href: '/factory/playbooks',
@@ -166,6 +181,16 @@ export default function FactoryOverviewPage() {
         <AILadder />
       </section>
 
+      {/* 1a2. The V-cycle, flattened: information flows left to right */}
+      <section className="mb-12">
+        <h2 className={sectionTitle}>The V-cycle, flattened</h2>
+        <p className={sectionLead}>
+          Read the V as one line. Information moves left to right, and each stage feeds the stage that checks it. The check
+          is already set up when the work is written, not added at the end.
+        </p>
+        <FlatVCycle />
+      </section>
+
       {/* 1b. The bottleneck moves to review */}
       <section className="mb-12">
         <h2 className={sectionTitle}>Faster output is only useful if review keeps up</h2>
@@ -253,7 +278,7 @@ export default function FactoryOverviewPage() {
       {/* 5. Explore */}
       <section className="mb-12">
         <h2 className={sectionTitle}>Explore the concept</h2>
-        <p className={sectionLead}>Follow one requirement from the dashboard, to a gate, to its evidence, to the code and tests behind it.</p>
+        <p className={sectionLead}>Follow one work order from the inbox, to a gate, to its evidence, to the code and tests behind it.</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {exploreViews.map((view) => {
             const Icon = view.icon;
